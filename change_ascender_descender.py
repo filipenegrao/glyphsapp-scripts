@@ -43,9 +43,9 @@ class AscenderDescenderModifier(object):
         descender_tab.txt_amount = TextBox((20, 60, -20, 20), "Raise Amount")
         descender_tab.amount = EditText((120, 60, -20, 20), "10")
         descender_tab.button_up = Button((20, 120, -20, 20), "Up", callback=self.move_stuff_descender)
-        ascender_tab.button_up.bind("uparrow", []) # shortcut
+        descender_tab.button_up.bind("uparrow", []) # shortcut
         descender_tab.button_down = Button((20, 150, -20, 20), "Down", callback=self.move_stuff_descender)
-        ascender_tab.button_down.bind("downarrow", []) # shortcut
+        descender_tab.button_down.bind("downarrow", []) # shortcut
 
         self.w.open()
 
