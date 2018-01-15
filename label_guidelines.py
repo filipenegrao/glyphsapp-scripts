@@ -1,8 +1,7 @@
-#MenuTitle: Guideline Labeler 3
+#MenuTitle: Label Guidelines
 # -*- coding: utf-8 -*-
 __doc__="""
 
-(GUI) ***Vanilla required***
 (GUI) Label Guidelines was written to (obviously) add labels to Guidelines.
 Additionally, it has the option to delete all guides (local or global). Vanilla required.
 

@@ -1,4 +1,4 @@
-# MenuTitle: Ascenders and Descenders Modifier 5 (bind key)
+# MenuTitle: Change Ascenders & Descenders
 # -*- coding: utf-8 -*-
 
 __doc__ = """

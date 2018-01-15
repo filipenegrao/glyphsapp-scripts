@@ -1,4 +1,4 @@
-#MenuTitle: (GUI) Export all open fonts to Indesign
+#MenuTitle: Export all Open Fonts
 # -*- coding: utf-8 -*-
 
 __doc__="""

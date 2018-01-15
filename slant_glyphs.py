@@ -1,10 +1,9 @@
-#MenuTitle: Slanter GUI 2
+#MenuTitle: Slant Glyphs
 # -*- coding: utf-8 -*-
 __doc__="""
 
 (GUI) This tool is build to slant all selected glyphs in Edit View while adds a copy of the roman version in the background.
-It's not supposed to be an automatic italic solution but gives you a head start. Vanilla required.
-
+It's not supposed to be an automatic italic solution but gives you a head start.
 ** Warning: ** this script erases all the layers in the background that wore previously there.
 Comment the following line to avoid that: background_layer.paths = []
 
