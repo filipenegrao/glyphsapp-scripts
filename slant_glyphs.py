@@ -23,7 +23,7 @@ class GlyphSlanter(object):
 
 # 1. USER INTERFACE
 
-		self.w = Window((250, 280), "Glyph Slanter")
+		self.w = Window((250, 280), "Slant Glyphs")
 
 		self.w.slant_label = TextBox((20, 20, -100, 20), u"Slant (°)", alignment = "right")
 		self.w.slant = EditText((160, 20, -20, 20), placeholder = "0")

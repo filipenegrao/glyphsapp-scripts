@@ -17,7 +17,7 @@ class LabelerWindow(object):
     def __init__(self):
         super(LabelerWindow, self).__init__()
 
-        self.w = Window((300, 200), "Labeler")
+        self.w = Window((300, 200), "Label Guidelines")
         self.w.box = Box((10, 10, -10, 80))
         self.w.box.txt = TextBox((10, 10, -20, 20), "Label name: ")
         self.w.box.editText = EditText((100, 10, -10, 20))
