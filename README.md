@@ -34,7 +34,7 @@ All these tools required Vanilla to work. To install the Vanilla module, go to G
 Please report any issues or pull requests here in GitHub. Don't forget to indicate your OS X and Glyphs App version.
 
 ## Requirements
-These scripts were tested using 2.5 and Mac OS 10.13. Should work on any Glyphs 2.x, but might requires some changes.
+These scripts were tested using 2.5 and Mac OS 10.13. They should work on any Glyphs 2.x, but might requires some changes.
 
 ## License
 Copyright (c) 2015–18 Filipe Negrão (@filipenegrao). It has some code samples by Georg Seifert (@schriftgestalt) and Rainer Erich Scheichelbauer (@mekkablue) that were posted in [Glyphs' App Forum] (https://glyphsapp.com/forum).
