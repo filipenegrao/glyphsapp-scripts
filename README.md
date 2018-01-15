@@ -29,7 +29,6 @@ This repository is a collection of useful (or not) Glyphs App's scripts. Check o
 Put the scripts inside the Scripts folder (Script > Open Scripts Folder or Cmd+Shift+Y). Then, hold down the Option key and choose Script > Reload Scripts (Cmd+Opt+Shift+Y). The scripts should appear in the Script menu.
 
 All these tools required Vanilla to work. To install the Vanilla module, go to Glyphs > Preferences... > Add-ons > Modules > Install Modules
-All these tools required Vanilla to work. To install the Vanilla module, go to  Glyphs > Preferences... > Add-ons > Modules > Install Modules
 
 ## Troubleshooting
 Please report any issues or pull requests here in GitHub. Don't forget to indicate your OS X and Glyphs App version.
