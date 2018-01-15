@@ -1,5 +1,5 @@
 # About
-A collection of useful (or not so useful) Glyphs App's scripts.
+This repository is a collection of useful (or not) Glyphs App's scripts. Check out how each one works in https://vimeo.com/album/4932608
 
 ## Scripts:
 
@@ -17,12 +17,12 @@ A collection of useful (or not so useful) Glyphs App's scripts.
 - ### Label Guidelines
 (GUI) Label Guidelines was written to (obviously) add labels to Guidelines. Additionally, it has the option to delete all guides (local or global). Vanilla required.
 
-![export-all-open-fonts-glyphs-script](img/guideline.png)
+![label-guidelines-glyphs-script](img/guideline.png)
 
 - ### Slant Glyphs
 (GUI) Based on based on Cyrus Highsmith and David Jonathan Ross's Italic Bowtie for Robofont, this tool is build to slant all selected glyphs in Edit View while adds a copy of the roman version in the background. It's not supposed to be an automatic italic solution but gives you a head start. Vanilla required. **Warning:** this script erases all the layers in the background that wore previously there. Comment the following line to avoid that: background_layer.paths = []
 
-![export-all-open-fonts-glyphs-script](img/slant.png)
+![slant-glyphs-script](img/slant.png)
 
 ## Installation
 
