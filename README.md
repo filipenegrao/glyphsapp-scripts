@@ -20,7 +20,7 @@ This repository is a collection of useful (or not) Glyphs App's scripts. Check o
 ![label-guidelines-glyphs-script](img/guideline.png)
 
 - ### Slant Glyphs
-(GUI) Based on based on Cyrus Highsmith and David Jonathan Ross's Italic Bowtie for Robofont, this tool is build to slant all selected glyphs in Edit View while adds a copy of the roman version in the background. It's not supposed to be an automatic italic solution but gives you a head start. Vanilla required. **Warning:** this script erases all the layers in the background that wore previously there. Comment the following line to avoid that: background_layer.paths = []
+(GUI) Based on Cyrus Highsmith and David Jonathan Ross's Italic Bowtie for Robofont, this tool is build to slant all selected glyphs in Edit View while adds a copy of the roman version in the background. It's not supposed to be an automatic italic solution but gives you a head start. Vanilla required. **Warning:** this script erases all the layers in the background that were previously there. Comment the following line to avoid that: background_layer.paths = []
 
 ![slant-glyphs-script](img/slant.png)
 
