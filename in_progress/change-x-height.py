@@ -19,19 +19,21 @@ XH = font.masters[0].xHeight
 AH = font.masters[0].ascender
 DH = font.masters[0].descender
 
+
 HALF_XH = int(XH / 2)
+# HALF_BOUND = int(W_BOUND / 2)
 T = 10  # the tolerance, that needs to adapt for each font
 RAISE_AMOUNT = 10
 
 # rect cordinates
-x1 = 0
-x2 = None  # This value will be defined in initial_safezone()
-y1 = HALF_XH - T
-y2 = HALF_XH + T
+# x1 = 0
+# x2 = None  # This value will be defined in initial_safezone()
+# y1 = HALF_XH - T
+# y2 = HALF_XH + T
 
 # Colors
-r, g, b, a = 255 / 255.0, 203 / 255.0, 51 / 255.0, 50 / 50.0
-
+r, g, b, a = 255 / 255.0, 203 / 255.0, 51 / 255.0, 20 / 100.0 
+# ry, gy, by, ay = 0 / 255.0, 0 / 255.0, 255.0 / 255.0, 20 / 100.0 
 
 def draw_ground(layer, info):
     # Due to internal Glyphs.app structure, we need to catch and print exceptions
@@ -69,19 +71,35 @@ def draw_path(some_layer, list_coord):
     some_layer.bezierPath.fill()
 
     # add your function to the hook
-    Glyphs.addCallback(draw_ground, DRAWFOREGROUND)
 
+    # Glyphs.addCallback(draw_ground, DRAWINACTIVE)
 
-def initial_safezone(point1, point2):
+def initial_safezone_vertical(point1, point2):
+    gname = glyph.name
+    x1, x2 = point1, point2
+    x1 -= T
+    x2 += T
+    y1 = DH
+    y2 = AH
+
+    bg = layer.background
+
+    print gname, ((x1, y1), (x1, y2), (x2, y2), (x2, y1))
+    current_glyph_list = [(x1, y1), (x1, y2), (x2, y2), (x2, y1)]
+    draw_path(bg, current_glyph_list)
+
+def initial_safezone_horizontal(point1, point2):
+    gname = glyph.name
     y1, y2 = point1, point2
     y1 -= T
     y2 += T
-    bg = layer.background
-    gname = glyph.name
     gwidth = font.glyphs[gname].layers[0].width
     x2 = gwidth
+    x1 = 0
 
-    print gname, y1, y2
+    bg = layer.background
+
+    # print gname, ((x1, y1), (x1, y2), (x2, y2), (x2, y1))
     current_glyph_list = [(x1, y1), (x1, y2), (x2, y2), (x2, y1)]
     draw_path(bg, current_glyph_list)
 
@@ -121,11 +139,22 @@ def find_closest_points(a_list, a_number, num_of_points):
 
     return closest_points
 
+Glyphs.clearLog()
+
 for glyph in font.glyphs:
     for layer in glyph.layers:
         if layer in Font.selectedLayers:
-            glyph = layer.parent
-            list_x = list_points()[0]
+
             list_y = list_points()[1]
-            p1, p2 = find_closest_points(list_y, HALF_XH, 2)
-            initial_safezone(p1, p2)
+            W_HALF = layer.bounds.size.width / 2
+            py1, py2 = find_closest_points(list_y, W_HALF, 2)
+            initial_safezone_horizontal(py1, py2)
+
+            list_x = list_points()[0]
+            px1, px2 = find_closest_points(list_x, HALF_XH, 2)
+            initial_safezone_vertical(px1, px2)
+
+
+
+# Glyphs.addCallback(draw_ground, DRAWBACKGROUND)
+Glyphs.showMacroWindow()
