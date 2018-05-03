@@ -4,13 +4,16 @@
 __doc__ = """
 
 (GUI) No doc at the moment.
-
 **Pro tip:** Use Arrows Up and Down as shortcuts.
 
 """
 
 
+
+
 from AppKit import NSColor
+from purenudge import nudgeMove
+
 font = Glyphs.font
 
 LAYER_NAME = 'xheigth-plugin-w'
@@ -21,29 +24,18 @@ DH = font.masters[0].descender
 
 
 HALF_XH = int(XH / 2)
-# HALF_BOUND = int(W_BOUND / 2)
-T = 10  # the tolerance, that needs to adapt for each font
+T = 20  # the tolerance, that needs to adapt for each font
 RAISE_AMOUNT = 10
 
-# rect cordinates
-# x1 = 0
-# x2 = None  # This value will be defined in initial_safezone()
-# y1 = HALF_XH - T
-# y2 = HALF_XH + T
-
-# Colors
-r, g, b, a = 255 / 255.0, 203 / 255.0, 51 / 255.0, 20 / 100.0 
-# ry, gy, by, ay = 0 / 255.0, 0 / 255.0, 255.0 / 255.0, 20 / 100.0 
-
-def draw_ground(layer, info):
-    # Due to internal Glyphs.app structure, we need to catch and print exceptions
-    # of these callback functions with try/except like so:
+def draw_color(layer, info):
+    r, g, b, a = 231 / 255.0, 227 / 255.0, 51 / 147.0, 50 / 100.0
     try:
         NSColor.colorWithCalibratedRed_green_blue_alpha_(r, g, b, a).set()
-        layer.background.bezierPath.fill()  # check how to draw on foreground
+        layer.background.bezierPath.fill()
     except:
         import traceback
         print traceback.format_exc()
+
 
 def create_new_layer(layer_name):
     for glyph in font.glyphs:
@@ -69,10 +61,6 @@ def draw_path(some_layer, list_coord):
     newPath.closed = True
     some_layer.paths.append(newPath)
     some_layer.bezierPath.fill()
-
-    # add your function to the hook
-
-    # Glyphs.addCallback(draw_ground, DRAWINACTIVE)
 
 def initial_safezone_vertical(point1, point2):
     gname = glyph.name
@@ -155,6 +143,6 @@ for glyph in font.glyphs:
             initial_safezone_vertical(px1, px2)
 
 
-
-# Glyphs.addCallback(draw_ground, DRAWBACKGROUND)
+Glyphs.addCallback(draw_color, DRAWFOREGROUND)
+# Glyphs.addCallback(draw_color, DRAWINACTIVE)
 Glyphs.showMacroWindow()
