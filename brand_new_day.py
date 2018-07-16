@@ -73,7 +73,8 @@ else:
     Glyphs.showMacroWindow()
 
     print "****************************************************"
-    print "Good luck on this brand new day! Do your best!"
-    print "The open file is the new one, created on %s." % now
-    print "Currently filepath: %s" % Glyphs.font.filepath
+    print "Have a nice day design cool stuff!"
+    print "This new file was created today (%s)." % now
+    print "Current file path: %s" % Glyphs.font.filepath
+    print "Log file: %s" % Glyphs.font.filepath
     print "****************************************************"
