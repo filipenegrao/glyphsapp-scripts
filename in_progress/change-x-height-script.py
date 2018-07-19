@@ -30,7 +30,7 @@ RAISE_AMOUNT = 10
 class XheightChanger(object):
 
     def __init__(self):
-                self.w = Window((280, 230), "Change that X-height")
+        self.w = Window((280, 230), "Change that X-height")
         self.w.tabs = Tabs((10, 10, -10, -10), ["height", "width"])
 
         # tab 1
@@ -110,7 +110,7 @@ class XheightChanger(object):
 
         print gname, ((x1, y1), (x1, y2), (x2, y2), (x2, y1))
         current_glyph_list = [(x1, y1), (x1, y2), (x2, y2), (x2, y1)]
-        draw_path(bg, current_glyph_list)
+        self.draw_path(bg, current_glyph_list)
 
     def initial_safezone_horizontal(self, point1, point2):
         gname = glyph.name
@@ -125,7 +125,7 @@ class XheightChanger(object):
 
         # print gname, ((x1, y1), (x1, y2), (x2, y2), (x2, y1))
         current_glyph_list = [(x1, y1), (x1, y2), (x2, y2), (x2, y1)]
-        draw_path(bg, current_glyph_list)
+        self.draw_path(bg, current_glyph_list)
 
 
     def list_points(self):
@@ -170,21 +170,23 @@ class XheightChanger(object):
         pass
 
 
+xchanger = XheightChanger()
 
-    for glyph in font.glyphs:
-        for layer in glyph.layers:
-            if layer in Font.selectedLayers:
+for glyph in font.glyphs:
+    for layer in glyph.layers:
+        if layer in Font.selectedLayers:
 
-                list_y = list_points()[1]
-                W_HALF = layer.bounds.size.width / 2
-                py1, py2 = find_closest_points(list_y, W_HALF, 2)
-                initial_safezone_horizontal(py1, py2)
+            list_y = xchanger.list_points()[1]
+            W_HALF = layer.bounds.size.width / 2
+            py1, py2 = xchanger.find_closest_points(list_y, W_HALF, 2)
+            xchanger.initial_safezone_horizontal(py1, py2)
 
-                list_x = list_points()[0]
-                px1, px2 = find_closest_points(list_x, HALF_XH, 2)
-                initial_safezone_vertical(px1, px2)
+            list_x = xchanger.list_points()[0]
+            px1, px2 = xchanger.find_closest_points(list_x, HALF_XH, 2)
+            xchanger.initial_safezone_vertical(px1, px2)
 
 
-    Glyphs.addCallback(draw_color, DRAWFOREGROUND)
-    # Glyphs.addCallback(draw_color, DRAWINACTIVE)
-    Glyphs.showMacroWindow()
+
+# Glyphs.addCallback(dc, DRAWFOREGROUND)
+# # Glyphs.addCallback(draw_color, DRAWINACTIVE)
+# Glyphs.showMacroWindow()
