@@ -187,6 +187,6 @@ for glyph in font.glyphs:
 
 
 
-# Glyphs.addCallback(dc, DRAWFOREGROUND)
-# # Glyphs.addCallback(draw_color, DRAWINACTIVE)
-# Glyphs.showMacroWindow()
+Glyphs.addCallback(dc, DRAWFOREGROUND)
+# Glyphs.addCallback(draw_color, DRAWINACTIVE)
+Glyphs.showMacroWindow()

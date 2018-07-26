@@ -1,4 +1,4 @@
-# MenuTitle: Narrow Diacritics maker, step 1
+# MenuTitle: Narrow Diacritics maker (in progress)
 # -*- coding: utf-8 -*-
 
 __doc__ = """

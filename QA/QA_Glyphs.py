@@ -302,36 +302,36 @@ class QADemo(object):
 
     def checkOvershoot(self):
 
-    """
-    The idea of this test is to check the overshoot consistency between glyphs.
-    For that, it takes a value as argument and check if the glyph has an anchor
-    with the same value. If not, it should return hasError = True.
+        """
+        The idea of this test is to check the overshoot consistency between glyphs.
+        For that, it takes a value as argument and check if the glyph has an anchor
+        with the same value. If not, it should return hasError = True.
 
-    """
+        """
 
-    hasError = False
+        hasError = False
 
-    for font in self.fonts:
+        for font in self.fonts:
 
-        capAbove = font.info.capHeight + OVERSHOOT
-        xAbove = font.info.xHeight + OVERSHOOT
-        baseBelow = OVERSHOOT
+            capAbove = font.info.capHeight + OVERSHOOT
+            xAbove = font.info.xHeight + OVERSHOOT
+            baseBelow = OVERSHOOT
 
-        print capAbove, xAbove, baseBelow
+            print capAbove, xAbove, baseBelow
 
-        for g in font:
-            if g.name in OVERSHOOT_UC_ABOVE.get("round"):
-                errorPoints = []
-                for contour in g:
-                    for p in contour.bPoints: # You only want to test if the y is in range of the cap height.
-                        if p.anchor[1] < (capAbove - TOLERANCE) or p.anchor[1] > (capAbove + TOLERANCE):
-                            continue # Not interested in points that are outside the range
-                        if p.anchor[1] != capAbove: # Now this one has to match the overshoot value.
-                            errorPoints.append(p.anchor)
-                if errorPoints:
-                    self.report('# %s Glyph "%s" has points "%s" error in overshoot \n' % (font.path.split('/')[-1], g.name, errorPoints))
-                    hasError = True
-    return hasError
+            for g in font:
+                if g.name in OVERSHOOT_UC_ABOVE.get("round"):
+                    errorPoints = []
+                    for contour in g:
+                        for p in contour.bPoints: # You only want to test if the y is in range of the cap height.
+                            if p.anchor[1] < (capAbove - TOLERANCE) or p.anchor[1] > (capAbove + TOLERANCE):
+                                continue # Not interested in points that are outside the range
+                            if p.anchor[1] != capAbove: # Now this one has to match the overshoot value.
+                                errorPoints.append(p.anchor)
+                    if errorPoints:
+                        self.report('# %s Glyph "%s" has points "%s" error in overshoot \n' % (font.path.split('/')[-1], g.name, errorPoints))
+                        hasError = True
+        return hasError
 
     def yourPersonalTest(self):
         has_error = False

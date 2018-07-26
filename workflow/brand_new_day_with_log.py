@@ -89,7 +89,7 @@ def log_entry(last_mod_file_date):
 def dict_to_md_tag(d):
     for k in d:
         d[k] = ', '.join(map(str, d[k]))
-    return "## %s\n**File path:** [%s](%s)\n \n **Glyphs changed:** %s" % (k, FONT_PATH, FONT_PATH, d[k])
+    return "## %s\n**File path:** [%s](%s)\n \n **Glyphs changed:** %s \n" % (k, FONT_PATH, FONT_PATH, d[k])
 
 
 def check_log_entry(filepath, str_line):
