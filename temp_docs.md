@@ -40,8 +40,7 @@ Drop me a line if you need any help.
 
 ![change-ascenders-descenders-glyphs-script](img/ascender_descender.png)
 
-
-**Cut Selection in Half (Horizontaly)**: pass
+**Cut Selection in Half (Horizontaly)**: If a path is selected, it cuts the path in half. Useful to design simetrical marks.
 
 
 ## Workflow
@@ -49,7 +48,7 @@ Drop me a line if you need any help.
 
 **Brand New Day With Log**: The difference between this script and the previous one is that this creates and writes a log file (.md and .txt) on the root folder.
 
-**Copy selected glyphs' names to Clipboard**: pass
+**Copy selected glyphs' names to Clipboard**: Easily copy a selected glyph's name to the clipboard. It is usefull to latter add glyphs to your font.
 
 **Export All Open Fonts**: (GUI) This script export all open fonts (instances inside fonts, to be precise) to a selected folder. The default folder is configured to ~/Library/Application Support/Adobe/Fonts. Vanilla required.
 
@@ -62,6 +61,14 @@ Drop me a line if you need any help.
 **Set color for current tab**: This script all about creates an *opt-cmd-r* shortcut for changing the color. Change R, G, B, A to your favorite color.
 
 **Start a new project**: This is not a Glyphs App script per se. If you have the same folder structure for every project, this script creates that structure in a breeze. Just edit the FOLDERS list to change my current arrangement, that has the following subfolders: critiques, mockups, proofs, fonts, sources, research, data, sketches.
+
+**Toggle enumerate node (from first to last)**: Toggle between with or without names in nodes by running the script and then pressing OPT + CMD + R.
+Please note that the enumeration follows the contours direction, meaning: 
+the node with the triangle (that indicates the first anchor) will be the #1.
+
+**Toggle enumerate node (from "Glyphs order")**: Toggle between with or without names in nodes by running the script and then pressing OPT + CMD + R.
+Please notice that the enumeration starts at the previous node as the first 'moveTo' operation on the path. More about this on [Glyphs Forum](https://forum.glyphsapp.com/t/order-of-nodes-starts-at-second-node/3737/3).
+
 
 ## Installation
 
