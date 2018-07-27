@@ -7,7 +7,7 @@ Drop me a line if you need any help.
 **Save vertical metrics data**: Takes the vertical metrics data and saves in a .cvs file for further analysis. I wrote this to compare the data between typefaces of the same style.
 
 ## Diacritics & Combs
-**Change the LSB and RSB for all comb glyphs**: Simply change the metric values for comb marks. It is set by default as 50 units (zero, maybe?), but can be modified for whatever you prefer. You just have to change the values layer.LSB and layer.RSB.
+**Change the LSB and RSB for all comb glyphs**: Simply change the metric values for comb marks. It is set by default as 50 units, but can be modified for whatever you prefer (zero, maybe?). You just have to change the layer.LSB and layer.RSB values.
 	
 **Narrow Diacritics maker (in progress)**: Duplicates "dieresiscomb", "gravecomb", "acutecomb", "brevecomb", "tildecomb", "macroncomb", "ogonekcomb" addind a ".narrow" suffix.
 
@@ -18,7 +18,7 @@ Drop me a line if you need any help.
 **Delete all anchors from current glyph**: Remove all anchors from current, selected glyph.
 
 ## Guides
-**Label Guidelines**: (GUI) Label Guidelines was written to (apparently) add labels to Guidelines. Additionally, it has the option to delete all guides (local or global). Vanilla required.
+**Label Guidelines**: (GUI) Label Guidelines was written to add labels to Guidelines. Additionally, it has the option to delete all guides (local or global). Vanilla required.
 
 ![label-guidelines-glyphs-script](img/guideline.png)
 
