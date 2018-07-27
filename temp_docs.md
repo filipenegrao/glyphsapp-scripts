@@ -40,10 +40,16 @@ Drop me a line if you need any help.
 
 ![change-ascenders-descenders-glyphs-script](img/ascender_descender.png)
 
+
+**Cut Selection in Half (Horizontaly)**: pass
+
+
 ## Workflow
 **Brand New Day**: This script creates a new folder named the current date (Y-M-D format) with all the same stuff you have inside the existing file's folder, including py scripts or anything you have on your glyphs file's folder. Then, the code closes the opened file and opens the new one. Based on Hannes Famira's workflow, which was type design instructors on Type@Cooper 2017.
 
 **Brand New Day With Log**: The difference between this script and the previous one is that this creates and writes a log file (.md and .txt) on the root folder.
+
+**Copy selected glyphs' names to Clipboard**: pass
 
 **Export All Open Fonts**: (GUI) This script export all open fonts (instances inside fonts, to be precise) to a selected folder. The default folder is configured to ~/Library/Application Support/Adobe/Fonts. Vanilla required.
 
