@@ -5,12 +5,12 @@ Drop me a line if you need any help.
 ## Data Extractors
 **Save vertical metrics data**: Save vertical metrics data: Takes the vertical metrics data and saves it in a .cvs file for further analysis. I wrote this to compare the data between typefaces of the same style.
 
-![](/Users/filipenegrao/Documents/github/glyphsapp-scripts/img/vertical_proportions.gif)
+![](img/vertical_proportions.gif)
 
 ## Diacritics & Combs
 **Change the LSB and RSB for all comb glyphs**: Simply changes the metric values for comb marks. It is set by default at 50 units by default but can be modified for whatever you prefer (zero, maybe?). You just have to change the layer.LSB and layer.RSB values.
 
-![Change the LSB and RSB for all comb glyphs](/Users/filipenegrao/Documents/github/glyphsapp-scripts/img/change_comb_SB_values.gif)
+![Change the LSB and RSB for all comb glyphs](img/change_comb_SB_values.gif)
 
 **Narrow diacritics maker (in progress)**: Duplicates "dieresiscomb", "gravecomb", "acutecomb", "brevecomb", "tildecomb", "macroncomb", "ogonekcomb", and a ".narrow" suffix.
 
@@ -49,7 +49,7 @@ Drop me a line if you need any help.
 
 **Brand New Day With Log**: The difference between this script and the previous one is that this creates and writes a log file (.md or .txt) on the root folder.
 
-![](/Users/filipenegrao/Documents/github/glyphsapp-scripts/img/brand_new_day_with_log.png)
+![](img/brand_new_day_with_log.png)
 
 **Copy selected glyphs' names to the clipboard:**: Easily copy a selected glyph's name to the clipboard. This is useful for adding glyphs to your font later.
 
@@ -69,7 +69,7 @@ Drop me a line if you need any help.
 Please note that the enumeration follows the contours direction, meaning: 
 the node with the triangle (that indicates the first anchor) will be the #1.
 
-![](/Users/filipenegrao/Documents/github/glyphsapp-scripts/img/toggle_enumerate_nodes_glyphs_order.gif)
+![](img/toggle_enumerate_nodes_glyphs_order.gif)
 
 **Toggle enumerate nodes (from "Glyphs order")**: Toggle between with or without names in nodes by running the script and then pressing OPT + CMD + R.
 Please notice that the enumeration starts at the previous node as the first 'moveTo' operation on the path. More about this on [Glyphs Forum](https://forum.glyphsapp.com/t/order-of-nodes-starts-at-second-node/3737/3).
