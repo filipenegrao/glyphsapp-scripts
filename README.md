@@ -51,7 +51,7 @@ Drop me a line if you need any help.
 
 * **Brand New Day With Log**: The difference between this script and the previous one is that this creates and writes a log file (.md or .txt) on the root folder.
 
-![](img/brand_new_day_with_log.png | width=100)
+![](img/brand_new_day_with_log.png)
 
 * **Copy selected glyphs' names to the clipboard:**: Easily copy a selected glyph's name to the clipboard. This is useful for adding glyphs to your font later.
 
