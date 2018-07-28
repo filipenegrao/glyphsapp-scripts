@@ -1,4 +1,4 @@
-#MenuTitle: Delete all anchors from current glyph
+#MenuTitle: Delete all anchors from the current glyph
 # -*- coding: utf-8 -*-
 
 __doc__="""

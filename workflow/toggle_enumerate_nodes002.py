@@ -1,4 +1,4 @@
-# MenuTitle: Toggle enumerate node (from "Glyphs order")
+# MenuTitle: Toggle enumerate nodes (from "Glyphs order")
 # -*- coding: utf-8 -*-
 
 __doc__ = """
