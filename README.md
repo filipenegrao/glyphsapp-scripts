@@ -8,7 +8,7 @@ Drop me a line if you need any help.
 ![](img/vertical_proportions.gif)
 
 ## Diacritics & Combs
-**Change the LSB and RSB for all comb glyphs**: Simply changes the metric values for comb marks. It is set by default at 50 units by default but can be modified for whatever you prefer (zero, maybe?). You just have to change the layer.LSB and layer.RSB values.
+* **Change the LSB and RSB for all comb glyphs**: Simply changes the metric values for comb marks. It is set by default at 50 units by default but can be modified for whatever you prefer (zero, maybe?). You just have to change the layer.LSB and layer.RSB values.
 
 ![](img/change_comb_SB_values.gif)
 
