@@ -26,19 +26,19 @@ Drop me a line if you need any help.
 ![](img/guideline.png)
 
 ## Italics
-* **Slant glyphs:** (GUI) Based on Cyrus Highsmith and David Jonathan Ross's Italic Bowtie for Robofont, this tool is built to slant all selected glyphs in Edit View while adding a copy of the Roman version in the background. It's not supposed to be an automatic italic solution but gives you a head start. Vanilla required.
+* **Slant glyphs**: (GUI) Based on Cyrus Highsmith and David Jonathan Ross's Italic Bowtie for Robofont, this tool is built to slant all selected glyphs in Edit View while adding a copy of the Roman version in the background. It's not supposed to be an automatic italic solution but gives you a head start. Vanilla required.
 
-**Warning:** This script erases all the layers in the background that were previously there. Comment the following line to avoid that: background_layer.paths = []
+**Warning**: This script erases all the layers in the background that were previously there. Comment the following line to avoid that: background_layer.paths = []
 
 ![slant-glyphs-script](img/slant.png)
 
 ## Kerning
 * **Create kerning groups for ligatures**: Search for all 'dligs' and set its kerning groups according to its reference glyphs.
 
-* **Important:** This script relies on Georg's script 'Diacritic Ligature Maker.py' so they must be together, like Siamese twins.
+* **Important**: This script relies on Georg's script 'Diacritic Ligature Maker.py' so they must be together, like Siamese twins.
 	 
 ## Paths
-* **Change ascenders & descenders:** Change Ascenders & Descenders: This code changes the height of ascenders or descenders of selected glyphs in Edit View. To do the script work properly, your overshoot parameter should be configured for, at least, the same as your highest overshoot (maybe I should have called this parameter "tolerance". Feel free to change that for me!)
+* **Change ascenders & descenders**: Change Ascenders & Descenders: This code changes the height of ascenders or descenders of selected glyphs in Edit View. To do the script work properly, your overshoot parameter should be configured for, at least, the same as your highest overshoot (maybe I should have called this parameter "tolerance". Feel free to change that for me!)
 
 **Pro tip:** Use the up and down arrows as shortcuts.
 
@@ -53,7 +53,7 @@ Drop me a line if you need any help.
 
 ![](img/brand_new_day_with_log.png)
 
-* **Copy selected glyphs' names to the clipboard:**: Easily copy a selected glyph's name to the clipboard. This is useful for adding glyphs to your font later.
+* **Copy selected glyphs' names to the clipboard**: Easily copy a selected glyph's name to the clipboard. This is useful for adding glyphs to your font later.
 
 * **Export all open fonts**: (GUI) This script exports all open fonts (instances inside fonts, to be precise) to a selected folder. The default folder is configured to ~/Library/Application Support/Adobe/Fonts. Vanilla is required.
 
@@ -89,7 +89,7 @@ I consider this the ideal way of installation because it is easier to maintain t
 1. Create an alias of the folder
 1. Move the alias to Glyphs' scripts folder
 
-**Important:** Some of those tools require Vanilla to work. To install the Vanilla module, go to Glyphs > Preferences... > Add-ons > Modules > Install Modules.
+**Important**: Some of those tools require Vanilla to work. To install the Vanilla module, go to Glyphs > Preferences... > Add-ons > Modules > Install Modules.
 
 
 ## Troubleshooting
