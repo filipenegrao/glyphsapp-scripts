@@ -1,14 +1,14 @@
-#MenuTitle: Label Guidelines
+# MenuTitle: Label Guidelines
 # -*- coding: utf-8 -*-
-__doc__="""
+
+from vanilla import *
+import GlyphsApp
+__doc__ = """
 
 (GUI) Label Guidelines was written to (obviously) add labels to Guidelines.
 Additionally, it has the option to delete all guides (local or global). Vanilla required.
 
 """
-
-import GlyphsApp
-from vanilla import *
 
 
 class LabelerWindow(object):
@@ -21,16 +21,20 @@ class LabelerWindow(object):
         self.w.box = Box((10, 10, -10, 80))
         self.w.box.txt = TextBox((10, 10, -20, 20), "Label name: ")
         self.w.box.editText = EditText((100, 10, -10, 20))
-        self.w.box.btn_add_label = Button((100, 40, -10, 20), "Add Label",callback=self.buttonAddLabelCallback)
-        self.w.btn1 = Button((114, 100, -24, 20), "Add metrics guides", callback=self.addGuideMetricsCallback)
-        self.w.btn2 = Button((114, 130, -24, 20), "Clear all global guides", callback=self.deleteGlobalCallback)
-        self.w.btn3 = Button((114, 160, -24, 20), "Clear local guides", callback=self.deleteLocalCallback)
+        self.w.box.btn_add_label = Button(
+            (100, 40, -10, 20), "Add Label", callback=self.buttonAddLabelCallback)
+        self.w.btn1 = Button(
+            (114, 100, -24, 20), "Add metrics guides", callback=self.addGuideMetricsCallback)
+        self.w.btn2 = Button(
+            (114, 130, -24, 20), "Clear all global guides", callback=self.deleteGlobalCallback)
+        self.w.btn3 = Button(
+            (114, 160, -24, 20), "Clear local guides", callback=self.deleteLocalCallback)
         self.w.open()
 
     def addGuide(self, pos_x, pos_y, ang, label=None):
         font = Glyphs.font
         font_master = font.selectedFontMaster
-        newGuide = GSGuideLine()
+        newGuide = GSGuide()
         newGuide.position = pos_x, pos_y
         newGuide.angle = ang
         newGuide.name = label + ': ' + str(pos_y)
@@ -49,11 +53,12 @@ class LabelerWindow(object):
 
     def buttonAddLabelCallback(self, sender):
         try:
-            if len(Layer.selection) == 1 and type(Layer.selection[0]) == GSGuideLine:
+            if len(Layer.selection) == 1 and type(Layer.selection[0]) == GSGuide:
                 Layer.selection[0].name = self.w.box.editText.get()
                 Glyphs.redraw()
             else:
-                Message('Labeler', 'Select a guideline first :)', OKButton=None)
+                Message('Labeler', 'Select a guideline first :)',
+                        OKButton=None)
         except Exception as e:
             raise e
 
