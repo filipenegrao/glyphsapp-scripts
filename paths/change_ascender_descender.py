@@ -1,5 +1,8 @@
 # MenuTitle: Change Ascenders & Descenders
 # -*- coding: utf-8 -*-
+from __future__ import division, print_function, unicode_literals
+import GlyphsApp
+from vanilla import *
 
 __doc__ = """
 
@@ -10,8 +13,6 @@ Vanilla required.
 
 """
 
-import GlyphsApp
-from vanilla import *
 
 font = Glyphs.font
 

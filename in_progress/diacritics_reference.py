@@ -1,5 +1,6 @@
 # MenuTitle: Diacritics reference
 # -*- coding: utf-8 -*-
+from __future__ import division, print_function, unicode_literals
 
 __doc__ = """
 
@@ -30,7 +31,7 @@ def create_layer(gname, layer_name):
         new_layer.name = layer_name
         glyph.layers.append(new_layer)
     else:
-        print 'The "{0}" layer already exists.'.format(layer_name)                  
+        print('The "{0}" layer already exists.'.format(layer_name))                  
         
 def draw_path(some_layer, list_coord):
     newPath = GSPath()
@@ -70,7 +71,7 @@ def draw_color(layer, info):
             l.bezierPath.fill()
     except:
         import traceback
-        print traceback.format_exc()
+        print(traceback.format_exc())
 
 for d_name in up_diacritics:
     x2 = x1 + font.glyphs[d_name].layers[0].width

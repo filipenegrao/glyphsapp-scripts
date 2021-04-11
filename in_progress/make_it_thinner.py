@@ -1,3 +1,4 @@
+from __future__ import print_function
 #MenuTitle: Make it thinner
 # -*- coding: utf-8 -*-
 
@@ -24,25 +25,25 @@ intersections = layer.intersectionsBetweenPoints((0, 350), (layer.width, 350))
 # print layer.width
 
 # left sidebearing at measurement line
-print intersections[1].x
+print(intersections[1].x)
 left_space = intersections[1].x
-print left_space
+print(left_space)
 
 # right sidebearing at measurement line
-print layer.width - intersections[-2].x
+print(layer.width - intersections[-2].x)
 right_space = layer.width - intersections[-2].x
-print right_space
+print(right_space)
 
 stem_horizontal =  layer.width - left - right
-print stem_horizontal
+print(stem_horizontal)
 
 x_middle = left_space + stem_horizontal / 2
-print x_middle
+print(x_middle)
 
 x_height = layer.glyphMetrics()[4]
 cap_height = layer.glyphMetrics()[2]
 angle = layer.glyphMetrics()[5]
-print x_height
+print(x_height)
 
 # access all selected nodes
 for path in layer.paths:

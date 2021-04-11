@@ -3,9 +3,10 @@
 """
 This code uses several extracts from Toshi Omagari's Nudge-move by Numerical Value
 published on https://github.com/Tosche/Glyphs-Scripts/blob/master/Path/Nudge-Move%20by%20Numerical%20Value.py
-Thank you for the author to share these! 
+Thanks for the author for sharing these! 
 
 """
+from __future__ import print_function
 
 def nudge(onMv, off1, off2, onSt, offsetX, offsetY):
         try:
@@ -40,10 +41,10 @@ def nudge(onMv, off1, off2, onSt, offsetX, offsetY):
             if distanceY2 != 0:
                 off2.y += (distanceY2/distanceY)*offsetY
 
-        except Exception, e:
+        except Exception as e:
             # brings macro window to front and reports error:
             Glyphs.showMacroWindow()
-            print "Nudge-move by Numerical Value Error (nudge): %s" % e
+            print("Nudge-move by Numerical Value Error (nudge): %s" % e)
 
 
 def nudgeMove(val, direction):
@@ -134,8 +135,8 @@ def nudgeMove(val, direction):
             glyph.endUndo()
             Font.enableUpdateInterface()
 
-    except Exception, e:
+    except Exception as e:
         # brings macro window to front and reports error:
         
         Glyphs.showMacroWindow()
-        print "Nudge-move by Numerical Value Error: %s" % e
+        print("Nudge-move by Numerical Value Error: %s" % e)

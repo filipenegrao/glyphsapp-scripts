@@ -1,3 +1,4 @@
+from __future__ import print_function
 from AppKit import NSColor
 
 font = Glyphs.font
@@ -20,7 +21,7 @@ def drawGlyphIntoBackground(layer, info):
         # Error. Print exception.
         except:
         	import traceback
-        	print traceback.format_exc()
+        	print(traceback.format_exc())
 
 # add your function to the hook
 Glyphs.addCallback(drawGlyphIntoBackground, DRAWBACKGROUND)

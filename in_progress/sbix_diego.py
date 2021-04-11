@@ -1,20 +1,12 @@
-#MenuTitle: Export all Open Fonts to UFO
+#MenuTitle: Export Sbix Color Font
 # -*- coding: utf-8 -*-
 from __future__ import division, print_function, unicode_literals
+
 from vanilla import *
-import os
 from os.path import expanduser
 from AppKit import NSOpenPanel
 import subprocess
 
-
-__doc__="""
-
-(GUI) This script export all open fonts' masters as UFO to a selected folder.
-The default folder is configured to 'your/font/folder/path'.
-Vanilla required.
-
-"""
 
 
 class ExportAllOPenFonts(object):
@@ -23,9 +15,8 @@ class ExportAllOPenFonts(object):
         super(ExportAllOPenFonts, self).__init__()
 
         # default folder:
-
-        font_path = font.filepath
-        folder_path = os.path.dirname(font_path)
+        home = expanduser("~")
+        folder_path = home
 
         fonts_list = self.opened_fonts_display()
 
@@ -49,8 +40,8 @@ class ExportAllOPenFonts(object):
         fonts_list = []
 
         for font in Glyphs.fonts:
-            for master in font.masters:
-                fonts_list.append(font.familyName + ' ' + master.name)
+            for instance in font.instances:
+                fonts_list.append(instance.familyName + ' ' + instance.name)
 
         fonts_list =  '\n'.join(fonts_list)
         return fonts_list
@@ -62,45 +53,30 @@ class ExportAllOPenFonts(object):
             panel.setCanChooseDirectories_(True)
             panel.setCanChooseFiles_(False)
             panel.setAllowsMultipleSelection_(False)
-
+            
             if panel.runModal() == 1:
                 for item in panel.URLs():
                     new_url = '/' + str(item).strip('file:/')
                     self.w.path.set(new_url)
+                    print(new_url)
                     return new_url
             else:
                 pass
         except Exception as e:
             raise e
 
-    def send_files(self):
+    def sbix_exporter(self):
         # get the folder location
         folder_location = self.w.path.get()
 
-        ufo_exporter = Glyphs.objectWithClassName_("GlyphsFileFormatUFO")
-        # fontpath = font.filepath
-        # folderpath = os.path.dirname(fontpath)
+        for font in Glyphs.fonts:
+            for instance in font.instances:
+                instance.generate('TTF', FontPath = folder_location, AutoHint = False, RemoveOverlap = False)
 
-
-        # send all open files to the folder_location
-        try:
-            if len(Glyphs.fonts) == 0:
-                Glyphs.showNotification('Export all open fonts', 'At least one font should be opened.')
-            else:
-                for font in Glyphs.fonts:
-                    for master in Glyphs.font.masters:
-                #       instance_font = instance.interpolatedFont
-                #       ufo_exporter.setFontMaster_(instance_font.masters[0])
-                        folder = folder_location
-                        ufo_filepath = os.path.join(folder, font.familyName + "-" + master.name + ".ufo")
-                        dest = NSURL.fileURLWithPath_(ufo_filepath)
-                        ufo_exporter.writeUfo_toURL_error_(master, dest, None)
-                Glyphs.showNotification('Export all open fonts', 'The fonts were exported successfully!')
-                subprocess.Popen(["open", folder_location])
-        except Exception as e:
-            raise e
+        Glyphs.showNotification('Export fonts', 'The export of %s was successful.' % (Glyphs.font.familyName))
+        subprocess.Popen(["open", folder_location])
 
     def py_magic(self, sender):
-        self.send_files()
+        self.sbix_exporter()
 
 ExportAllOPenFonts()

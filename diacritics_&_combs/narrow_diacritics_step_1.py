@@ -1,5 +1,6 @@
 # MenuTitle: Narrow Diacritics maker (in progress)
 # -*- coding: utf-8 -*-
+from __future__ import division, print_function, unicode_literals
 
 __doc__ = """
 
@@ -20,13 +21,13 @@ for d in diacritics:
     narrow_diacritics.append(g_narrow)
 
     if font.glyphs[g_narrow]:
-        print "%s already exist." % g_narrow
+        print("%s already exist." % g_narrow)
         pass
 
     else:
         g = font.glyphs[d]
         g.duplicate(g_narrow)
-        print "%s was created" % g_narrow
+        print("%s was created" % g_narrow)
 
 
 for i, master in enumerate(font.masters):
@@ -40,7 +41,7 @@ for i, master in enumerate(font.masters):
         for path in layer1.paths:
             new_path = path.copy()
             background_layer2.append(new_path)
-            print "idotless %s was copy to %s %s background layer" % (layer1.name, d, layer2.name)
+            print("idotless %s was copy to %s %s background layer" % (layer1.name, d, layer2.name))
 
 ndiacritics = '/'.join([i for i in narrow_diacritics])
 

@@ -1,3 +1,4 @@
+from __future__ import print_function
 from AppKit import NSColor
 
 font = Glyphs.font
@@ -36,13 +37,13 @@ def create_new_layer(layer_name):
     for glyph in font.glyphs:
         for layer in glyph.layers:
             if layer in Font.selectedLayers:
-                print layer
+                print(layer)
                 if not glyph.layers[layer_name]:
                     new_layer = GSLayer()
                     new_layer.name = layer_name
                     glyph.layers.append(new_layer)
                 else:
-                    print 'The "{0}" layer already exists.'.format(layer_name)
+                    print('The "{0}" layer already exists.'.format(layer_name))
 
 
 
@@ -54,7 +55,7 @@ def draw_ground(layer, info):
         layer.background.bezierPath.fill()  # check how to draw on foreground
     except:
         import traceback
-        print traceback.format_exc()
+        print(traceback.format_exc())
 
 
 def draw_path(some_layer, list_coord):
@@ -96,7 +97,7 @@ def main():
     for glyph in font.glyphs:
         for layer in glyph.layers:
             if layer in Font.selectedLayers:
-                print layer
+                print(layer)
                 n_layer = create_new_layer(LAYER_NAME)
                 initial_safezone(n_layer)
 

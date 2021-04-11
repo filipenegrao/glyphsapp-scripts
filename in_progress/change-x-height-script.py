@@ -1,5 +1,6 @@
 # MenuTitle: Change X-Height
 # -*- coding: utf-8 -*-
+from __future__ import division, print_function, unicode_literals
 
 __doc__ = """
 
@@ -70,20 +71,20 @@ class XheightChanger(object):
             layer.background.bezierPath.fill()
         except:
             import traceback
-            print traceback.format_exc()
+            print(traceback.format_exc())
 
 
     def create_new_layer(self, layer_name):
         for glyph in font.glyphs:
             for layer in glyph.layers:
                 if layer in Font.selectedLayers:
-                    print layer
+                    print(layer)
                     if not glyph.layers[layer_name]:
                         new_layer = GSLayer()
                         new_layer.name = layer_name
                         glyph.layers.append(new_layer)
                     else:
-                        print 'The "{0}" layer already exists.'.format(layer_name)
+                        print('The "{0}" layer already exists.'.format(layer_name))
 
     def draw_path(self, some_layer, list_coord):
         newPath = GSPath()
@@ -108,7 +109,7 @@ class XheightChanger(object):
 
         bg = layer.background
 
-        print gname, ((x1, y1), (x1, y2), (x2, y2), (x2, y1))
+        print(gname, ((x1, y1), (x1, y2), (x2, y2), (x2, y1)))
         current_glyph_list = [(x1, y1), (x1, y2), (x2, y2), (x2, y1)]
         self.draw_path(bg, current_glyph_list)
 

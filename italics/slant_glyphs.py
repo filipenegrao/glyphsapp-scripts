@@ -1,5 +1,8 @@
 #MenuTitle: Slant Glyphs
 # -*- coding: utf-8 -*-
+from __future__ import division, print_function, unicode_literals
+
+
 __doc__="""
 
 (GUI) This tool is build to slant all selected glyphs in Edit View while adds a copy of the roman version in the background.
@@ -63,7 +66,7 @@ class GlyphSlanter(object):
 	def get_vertical(self):
 		try:
 			if len(self.w.height.get()) == 0:
-				print 1.0
+				print(1.0)
 				return 1.0
 			else:
 				return float(self.w.height.get()) / 100.0
@@ -77,7 +80,7 @@ class GlyphSlanter(object):
 				return rgba_float
 			else:
 				RGBA = self.w.color_well.get()
-				print RGBA
+				print(RGBA)
 				rgba_str = str(RGBA)
 				rgba_str = rgba_str.replace('sRGB IEC61966-2.1 colorspace ', '')
 				rgba_str = rgba_str.split(' ')
@@ -102,7 +105,7 @@ class GlyphSlanter(object):
 	def coloring_background(self, layer, info):
 		# get RGBA colors from def get_color
 		color_rgba = self.get_color()
-		print color_rgba
+		print(color_rgba)
 		R, G, B, A = color_rgba
 		try:
 			NSColor.colorWithCalibratedRed_green_blue_alpha_(R, G, B, A).set()
@@ -110,7 +113,7 @@ class GlyphSlanter(object):
 		# Error. Print exception.
 		except Exception as e:
 			raise e
-			print traceback.format_exc()
+			print(traceback.format_exc())
 
 	def copy_fore2background(self):
 		# iterate all paths and append them into the list of paths.

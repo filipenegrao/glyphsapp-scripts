@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
 import os
 from datetime import datetime
 
@@ -48,9 +49,9 @@ def check_folder(folderpath):
     '''
     if not os.path.exists(folderpath):
         os.makedirs(folderpath)
-        print 'The log file was created in %s' % folderpath
+        print('The log file was created in %s' % folderpath)
     else:
-        print '%s already exists.' % folderpath
+        print('%s already exists.' % folderpath)
     return folderpath
 
 
@@ -61,10 +62,10 @@ def check_file(filepath):
     '''
     if not os.path.exists(filepath):
         file = open(filepath, 'w')
-        print 'The log file was created in %s' % filepath
+        print('The log file was created in %s' % filepath)
     else:
         pass
-        print 'Log file already exists in %s.' % filepath
+        print('Log file already exists in %s.' % filepath)
     return filepath
 
 

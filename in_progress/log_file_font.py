@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*- 
 
+from __future__ import print_function
 import os
 import json
 from datetime import datetime
@@ -87,7 +88,7 @@ import os
 cwd = os.getcwd()
 f = cwd + '/new_file002.txt'
 
-print f  # def check_file
+print(f)  # def check_file
 # print check_content(f, 'ops')  # def check_content
 
 new_file = check_file(f)
@@ -101,4 +102,4 @@ l2 = new_data['456']
 list3 = ['a', 'b', 'c', 'd']
 list4 = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
 
-print compare_two_lists(list3, list4)
+print(compare_two_lists(list3, list4))

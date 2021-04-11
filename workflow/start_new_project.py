@@ -1,5 +1,8 @@
 # MenuTitle: Start a new project
 # -*- coding: utf-8 -*-
+from __future__ import division, print_function, unicode_literals
+import os
+from datetime import datetime
 
 __doc__ = """
 
@@ -8,8 +11,6 @@ Just edit the FOLDERS list to change my default structure.
 
 """
 
-import os
-from datetime import datetime
 
 # date stuff
 NOW = datetime.now()
@@ -50,27 +51,27 @@ def list_files(startpath):
 
 if not os.path.exists(PATH + DIR):
     os.makedirs(PATH + DIR)
-    print("%s was created in %s") % (DIR, PATH)
+    print(("%s was created in %s") % (DIR, PATH))
     for folder in FOLDERS:
         os.makedirs(PATH + DIR + "/" + folder)
 else:
-    print("The %s folder already exists in %s.") % (DIR, PATH)
+    print(("The %s folder already exists in %s.") % (DIR, PATH))
 
 if not os.path.exists(DIR_DATE):
     os.makedirs(DIR_DATE)
 else:
-    print " "
-    print "It's all done, mate. Do not complicate things. Look:"
+    print(" ")
+    print("It's all done, mate. Do not complicate things. Look:")
 
 if FONT.filepath == None:
-    print "Please, save you file first."
+    print("Please, save you file first.")
 else:
     os.rename(FONT.filepath, FULL_PATH)
 
 Glyphs.showMacroWindow()
 
-print " "
-print "=" * 50
-print " "
+print(" ")
+print("=" * 50)
+print(" ")
 
 list_files(PATH + DIR)

@@ -1,3 +1,4 @@
+from __future__ import print_function
 import filecmp
 from os.path import normpath, basename
 
@@ -6,14 +7,14 @@ file2 = '/Users/filipenegrao/Documents/design-de-tipos/ar_sans_2017/sources_roma
 dir2 = '/Users/filipenegrao/Documents/design-de-tipos/ar_sans_2017/sources_roman/2018-4-23'
 dir1 = '/Users/filipenegrao/Documents/design-de-tipos/ar_sans_2017/sources_roman/2018-04-19'
 
-print filecmp.cmp(file1, file2)
+print(filecmp.cmp(file1, file2))
 
 from filecmp import dircmp
 
 def print_diff_files(dcmp):
 
     for name in dcmp.diff_files:
-        print "diff_file %s found in %s and %s" % (name, dcmp.left, dcmp.right)
+        print("diff_file %s found in %s and %s" % (name, dcmp.left, dcmp.right))
 
     for sub_dcmp in dcmp.subdirs.values():
         print_diff_files(sub_dcmp)
@@ -34,7 +35,7 @@ fname2 = basename(normpath(dir2))
 
 # Print confirmation
 print("-----------------------------------")
-print("Comparing files ", " > " + fname1, " < " + fname2)
+print(("Comparing files ", " > " + fname1, " < " + fname2))
 print("-----------------------------------")
 
 # Read the first line from the files
@@ -56,17 +57,17 @@ while f1_line != '' or f2_line != '':
         
         # If a line does not exist on file2 then mark the output with + sign
         if f2_line == '' and f1_line != '':
-            print(">+", "Line-%d" % line_no, f1_line)
+            print((">+", "Line-%d" % line_no, f1_line))
         # otherwise output the line on file1 and mark it with > sign
         elif f1_line != '':
-            print(">", "Line-%d" % line_no, f1_line)
+            print((">", "Line-%d" % line_no, f1_line))
             
         # If a line does not exist on file1 then mark the output with + sign
         if f1_line == '' and f2_line != '':
-            print("<+", "Line-%d" % line_no, f2_line)
+            print(("<+", "Line-%d" % line_no, f2_line))
         # otherwise output the line on file2 and mark it with < sign
         elif f2_line != '':
-            print("<", "Line-%d" %  line_no, f2_line)
+            print(("<", "Line-%d" %  line_no, f2_line))
 
         # Print a blank line
         print()

@@ -1,5 +1,6 @@
 #MenuTitle: Add label to selected guideline
 # -*- coding: utf-8 -*-
+from __future__ import division, print_function, unicode_literals
 
 __doc__="""
 Add label to selected guideline.
@@ -33,6 +34,6 @@ class WindowLabel(object):
 	def nameLabel(self, sender):
 		label_name = (self.w.editText.get())
 		Layer.selection[0].name = label_name
-		print "label add to selected guideline: " + label_name
+		print("label add to selected guideline: " + label_name)
 
 WindowLabel()

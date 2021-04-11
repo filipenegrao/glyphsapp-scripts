@@ -1,5 +1,6 @@
 #MenuTitle: Export Open Instances to InDesign 1.0
 # -*- coding: utf-8 -*-
+from __future__ import division, print_function, unicode_literals
 
 __doc__="""
 Export all open instances in OTF in Indesign font's folder.
@@ -17,14 +18,14 @@ folder = 'exported_from_glyphs'
 path = home+desktop+folder
 indesign_folder = r'/Applications/Adobe InDesign CC 2015/Fonts/'
 
-print folder
+print(folder)
 
 # check if the folder already exists. If not, create the folder
 if os.path.exists(path):
-	print 'The %s already exists in %s' %(folder, path)
+	print('The %s already exists in %s' %(folder, path))
 else:
 	os.mkdir(path)
-	print 'Folder %s created in %s' %(folder, path)
+	print('Folder %s created in %s' %(folder, path))
 
 # remove all files before save the new ones
 all_files = glob.glob(path+'/*')

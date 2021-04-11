@@ -1,3 +1,4 @@
+from __future__ import print_function
 
 from copy import copy
 font = Glyphs.font
@@ -29,14 +30,14 @@ def _duplicate_glyph(glyph, suffix=None):
 def duplicate_glyph(glyph, suffix):
 	if not glyph_exists(glyph.name + suffix):
 		_duplicate_glyph(glyph, suffix)
-		print "Glyph %s was created." % (glyph.name + suffix)
+		print("Glyph %s was created." % (glyph.name + suffix))
 	else:
-		print "Glyph %s already exists." % (glyph.name + suffix)
+		print("Glyph %s already exists." % (glyph.name + suffix))
 
 
 def paths_to_layer(layer1, layer2):
 	layer2.paths = copy(layer1.paths)
-	print "%s's paths were copy to %s" % (layer1.parent.name, layer2.parent.name)
+	print("%s's paths were copy to %s" % (layer1.parent.name, layer2.parent.name))
 
 
 # duplicate_glyph(glyph, ".002")
@@ -45,5 +46,5 @@ def paths_to_layer(layer1, layer2):
 O_regular = glyph.layers["Regular"]
 O_bold = glyph.layers["Bold"]
 
-print R_bold
+print(R_bold)
 # paths_to_layer(O_regular, O_bold)

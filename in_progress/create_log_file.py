@@ -1,3 +1,4 @@
+from __future__ import print_function
 from datetime import datetime
 import os
 import json
@@ -51,6 +52,6 @@ for i, master in enumerate(font.masters):
             continue
         else:
             if glyph.name not in data[current_master]:
-                print 'Glyph added in %s: %s' % (current_master, glyph.name)
+                print('Glyph added in %s: %s' % (current_master, glyph.name))
 
 

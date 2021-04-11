@@ -1,5 +1,6 @@
 # MenuTitle: Brand New Day (with log file)
 # -*- coding: utf-8 -*-
+from __future__ import division, print_function, unicode_literals
 
 __doc__ = """
 
@@ -161,9 +162,9 @@ Glyphs.open(NEW_FILE_PATH)
 Glyphs.showMacroWindow()
 
 
-print "****************************************************"
-print "Have a nice day!"
-print "This new file was created today (%s)." % TODAY
-print "Current file path: %s" % Glyphs.font.filepath
-print "Log file: %s" % LOG_FILE_MD
-print "****************************************************"
+print("****************************************************")
+print("Have a nice day!")
+print("This new file was created today (%s)." % TODAY)
+print("Current file path: %s" % Glyphs.font.filepath)
+print("Log file: %s" % LOG_FILE_MD)
+print("****************************************************")

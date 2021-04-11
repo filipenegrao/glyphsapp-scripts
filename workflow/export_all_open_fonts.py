@@ -1,5 +1,10 @@
 #MenuTitle: Export all Open Fonts
 # -*- coding: utf-8 -*-
+from __future__ import division, print_function, unicode_literals
+from vanilla import *
+from os.path import expanduser
+from AppKit import NSOpenPanel
+import subprocess
 
 __doc__="""
 
@@ -9,10 +14,7 @@ Vanilla required.
 
 """
 
-from vanilla import *
-from os.path import expanduser
-from AppKit import NSOpenPanel
-import subprocess
+
 
 
 class ExportAllOPenFonts(object):

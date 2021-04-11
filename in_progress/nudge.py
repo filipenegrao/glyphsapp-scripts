@@ -6,6 +6,7 @@ published in https://github.com/Tosche/Glyphs-Scripts/blob/master/Path/Nudge-Mov
 Thank you for the author to share these! 
 
 """
+from __future__ import print_function
 
 class Nudge(object):
 
@@ -42,10 +43,10 @@ class Nudge(object):
                 if distanceY2 != 0:
                     off2.y += (distanceY2/distanceY)*offsetY
 
-            except Exception, e:
+            except Exception as e:
                 # brings macro window to front and reports error:
                 Glyphs.showMacroWindow()
-                print "Nudge-move by Numerical Value Error (nudge): %s" % e
+                print("Nudge-move by Numerical Value Error (nudge): %s" % e)
 
 
     def nudgeMove(self, sender):
@@ -126,7 +127,7 @@ class Nudge(object):
                 glyph.endUndo()
                 Font.enableUpdateInterface()
 
-        except Exception, e:
+        except Exception as e:
             # brings macro window to front and reports error:
             Glyphs.showMacroWindow()
-            print "Nudge-move by Numerical Value Error: %s" % e
+            print("Nudge-move by Numerical Value Error: %s" % e)

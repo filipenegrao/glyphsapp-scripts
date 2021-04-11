@@ -1,5 +1,6 @@
 # MenuTitle: Brand New Day
 # -*- coding: utf-8 -*-
+from __future__ import division, print_function, unicode_literals
 
 __doc__ = """
 
@@ -46,7 +47,7 @@ new_folder = one_level_down + '/' + today
 if not os.path.exists(new_folder):
     os.makedirs(new_folder)
 else:
-    print '%s already exists.' % new_folder
+    print('%s already exists.' % new_folder)
 
 # Check if the file already exists in the new folder
 # In case you run the program 2 times, for example:
@@ -54,8 +55,8 @@ os.chdir(new_folder)
 if os.path.isfile(current_file_name):
     Glyphs.clearLog()
     Glyphs.showMacroWindow()
-    print "The file %s already exists in %s" % (current_file_name, new_folder)
-    print "You are currently on %s" % current_file_path
+    print("The file %s already exists in %s" % (current_file_name, new_folder))
+    print("You are currently on %s" % current_file_path)
 else:
     LAST_SOURCE = current_folder_path
     TODAYS_SOURCE = new_folder
@@ -72,9 +73,9 @@ else:
     Glyphs.clearLog()
     Glyphs.showMacroWindow()
 
-    print "****************************************************"
-    print "Have a nice day design cool stuff!"
-    print "This new file was created today (%s)." % now
-    print "Current file path: %s" % Glyphs.font.filepath
-    print "Log file: %s" % Glyphs.font.filepath
-    print "****************************************************"
+    print("****************************************************")
+    print("Have a nice day design cool stuff!")
+    print("This new file was created today (%s)." % now)
+    print("Current file path: %s" % Glyphs.font.filepath)
+    print("Log file: %s" % Glyphs.font.filepath)
+    print("****************************************************")

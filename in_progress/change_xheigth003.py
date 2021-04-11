@@ -1,3 +1,4 @@
+from __future__ import print_function
 font = Glyphs.font
 
 # get active layer
@@ -50,7 +51,7 @@ def guess_protected_nodes(layer):
 						curve_nodes_x.append(node)
 	return curve_nodes_x
 
-print "len: ", len(guess_protected_nodes(layer))
+print("len: ", len(guess_protected_nodes(layer)))
 
 list_nodes = guess_protected_nodes(layer)
 # print list_nodes

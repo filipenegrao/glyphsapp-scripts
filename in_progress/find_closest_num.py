@@ -1,3 +1,4 @@
+from __future__ import print_function
 
 def find_closest_points(some_list, a_number, num_of_points):
 
@@ -21,7 +22,7 @@ def find_closest_points(some_list, a_number, num_of_points):
 
 
 test_list = [1, 2, 3, 4, 12, 15, 21, 24, 34, 35, 36]
-print find_closest_points(test_list, 35, 4)
+print(find_closest_points(test_list, 35, 4))
 
 
 def list_points(some_glyph):
