@@ -47,4 +47,6 @@ Thumbs.db
 *.ttf
 *.woff
 
-# Directories #
+# Third party #
+.idea
+.vscode
