@@ -37,10 +37,11 @@ ehthumbs.db
 Thumbs.db
 
 # backup files #
-######################
+################
 *.bak
 
 # font files #
+##############
 *.ufo
 *.glyphs
 *.otf
@@ -48,5 +49,6 @@ Thumbs.db
 *.woff
 
 # Third party #
+###############
 .idea
 .vscode
