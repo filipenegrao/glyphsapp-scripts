@@ -1,13 +1,14 @@
-from __future__ import print_function
 # MenuTitle: Create a center guideline between two points.
 # -*- coding: utf-8 -*-
+from __future__ import division, print_function, unicode_literals
+from Foundation import NSPoint
+
 
 __doc__="""
 
 Create a guideline guideline between two points.
 
 """
-
 
 f = Glyphs.font
 glyphs = f.glyphs

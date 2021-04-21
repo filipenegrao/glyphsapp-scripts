@@ -1,5 +1,6 @@
 #MenuTitle: For each master, create a less glyph from a greater component
 # -*- coding: utf-8 -*-
+from __future__ import division, print_function, unicode_literals
 
 __doc__="""
 

@@ -1,21 +1,23 @@
 #MenuTitle: Slant Glyphs
 # -*- coding: utf-8 -*-
 from __future__ import division, print_function, unicode_literals
+import copy
+import math
+import traceback
+from vanilla import *
+from AppKit import NSColor, NSCalibratedRGBColor
 
 
 __doc__="""
 
 (GUI) This tool is build to slant all selected glyphs in Edit View while adds a copy of the roman version in the background.
 It's not supposed to be an automatic italic solution but gives you a head start.
+
 ** Warning: ** this script erases all the layers in the background that wore previously there.
 Comment the following line to avoid that: background_layer.paths = []
 
 """
-import copy
-import math
-import traceback
-from vanilla import *
-from AppKit import *
+
 
 
 class GlyphSlanter(object):
@@ -66,7 +68,6 @@ class GlyphSlanter(object):
 	def get_vertical(self):
 		try:
 			if len(self.w.height.get()) == 0:
-				print(1.0)
 				return 1.0
 			else:
 				return float(self.w.height.get()) / 100.0
@@ -110,6 +111,7 @@ class GlyphSlanter(object):
 		try:
 			NSColor.colorWithCalibratedRed_green_blue_alpha_(R, G, B, A).set()
 			layer.background.bezierPath.fill()
+			print(color_rgba)
 		# Error. Print exception.
 		except Exception as e:
 			raise e
@@ -120,7 +122,7 @@ class GlyphSlanter(object):
 		try:
 			for layer in Font.selectedLayers:
 				background_layer = layer.background
-				background_layer.paths = []
+				# background_layer.paths = []
 				for path in layer.paths:
 					new_path = path.copy()
 					background_layer.paths.append(new_path)
@@ -133,7 +135,7 @@ class GlyphSlanter(object):
 				layer.applyTransform([
 						horizontal, # x scale factor
 						0.0, # x skew factor
-						math.radians(angle), # y skew factor
+						math.radians(angle), (center), # y skew factor
 						vertical, # y scale factor
 						0.0, # x position
 						0.0  # y position
@@ -160,3 +162,21 @@ class GlyphSlanter(object):
 
 
 GlyphSlanter()
+
+"""
+Traceback (most recent call last):
+
+  File "/Users/filipenegrao/Library/Application Support/Glyphs 3/Scripts/vanilla/vanillaBase.py", line 506, in action_
+    self.callback(sender)
+
+  File "/Users/filipenegrao/Documents/github/glyphsapp-scripts/italics/slant_glyphs.py", line 151, in selected_glyphs_callback
+    self.copy_fore2background()
+
+  File "/Users/filipenegrao/Documents/github/glyphsapp-scripts/italics/slant_glyphs.py", line 129, in copy_fore2background
+    raise e
+
+  File "/Users/filipenegrao/Documents/github/glyphsapp-scripts/italics/slant_glyphs.py", line 124, in copy_fore2background
+    background_layer.paths = []
+
+AttributeError: can't set attribute
+"""

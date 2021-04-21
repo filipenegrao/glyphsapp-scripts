@@ -1,5 +1,7 @@
 #MenuTitle: Set Kerning Groups
-# encoding: utf-8
+# -*- coding: utf-8 -*-
+from __future__ import division, print_function, unicode_literals
+
 # Copyright: Georg Seifert, 2010, www.schriftgestaltung.de Version 1.0
 
 import sys
@@ -852,25 +854,25 @@ def KeysForGlyph(Glyph):
 	try:
 		LeftKey = Glyph.leftKerningGroup
 	except:
-		print traceback.format_exc()
+		print(traceback.format_exc())
 	try:
 		RightKey = Glyph.rightKerningGroup
 	except:
-		print traceback.format_exc()
+		print(traceback.format_exc())
 	try:
 		if len(LeftKey < 1):
 			LeftKey = False
 	except TypeError:
 		pass
 	except:
-		print traceback.format_exc()
+		print(traceback.format_exc())
 	try:
 		if len(RightKey < 1):
 			RightKey = False
 	except TypeError:
 		pass
 	except:
-		print traceback.format_exc()
+		print(traceback.format_exc())
 	return (LeftKey, RightKey)
 
 def updateKeyGlyphsForSelected():
@@ -931,14 +933,14 @@ def updateKeyGlyphsForSelected():
 			except KeyError:
 				pass
 			except:
-				print traceback.format_exc()
+				print(traceback.format_exc())
 		if not RightKey:
 			try:
 				RightKey = DefaultKeys[Glyph.name][1]
 			except KeyError:
 				pass
 			except:
-				print traceback.format_exc()
+				print(traceback.format_exc())
 		if not LeftKey and Glyph.name[-3:] == ".sc":
 			try:
 				Glyph
@@ -946,29 +948,29 @@ def updateKeyGlyphsForSelected():
 				if (len(LeftKey) > 0):
 					LeftKey = LeftKey.lower()+".sc"
 			except:
-				print traceback.format_exc()
+				print(traceback.format_exc())
 		if not RightKey and Glyph.name[-3:] == ".sc":
 			try:
 				RightKey = DefaultKeys[Glyph.name[:-3].title()][1]
 				if (len(RightKey) > 0):
 					RightKey = RightKey.lower()+".sc"
 			except:
-				print traceback.format_exc()
+				print(traceback.format_exc())
 		if not LeftKey:
 			LeftKey = Glyph.name
 		if not RightKey:
 			RightKey = Glyph.name
 		
-		print Glyph.name, ">", LeftKey, RightKey
+		print(Glyph.name, ">", LeftKey, RightKey)
 		if Glyph.leftKerningGroup is None or len(Glyph.leftKerningGroup) == 0:
 			Glyph.setLeftKerningGroup_(LeftKey)
 		if Glyph.rightKerningGroup is None or len(Glyph.rightKerningGroup) == 0:
 			Glyph.setRightKerningGroup_(RightKey)
 
 def main():
- 	print "*** Start Update Key Glyphs ***\n"
+ 	print("*** Start Update Key Glyphs ***\n")
 	updateKeyGlyphsForSelected()
-	print "*** Ende ****"
+	print("*** Ende ****")
 	
 def test():
 	NewDefaultKeys = {}
@@ -978,6 +980,6 @@ def test():
 		newValues = []
 		for value in values:
 			newValues.append( niceName(value) )
-		print "	\"%s\" : [\"%s\", \"%s\"]," % (key, newValues[1], newValues[0])
+		print("	\"%s\" : [\"%s\", \"%s\"]," % (key, newValues[1], newValues[0]))
 		NewDefaultKeys[key] = newValues
 main()

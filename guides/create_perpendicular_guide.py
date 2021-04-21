@@ -1,6 +1,9 @@
 # MenuTitle: Create a perpendicular guide from another guide.
 # -*- coding: utf-8 -*-
 
+from __future__ import division, print_function, unicode_literals
+from Foundation import NSPoint
+
 __doc__="""
 
 Create a perpendicular guide from another guide. Select a guide and run it.

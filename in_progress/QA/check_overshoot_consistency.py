@@ -1,5 +1,6 @@
-font = Glyphs.font
+from __future__ import print_function
 Glyphs.clearLog()
+font = Glyphs.font
 
 
 above_lc = {

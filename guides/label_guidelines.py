@@ -1,15 +1,16 @@
 # MenuTitle: Label Guidelines
 # -*- coding: utf-8 -*-
 
+from __future__ import division, print_function, unicode_literals
 from vanilla import *
 import GlyphsApp
+
 __doc__ = """
 
 (GUI) Label Guidelines was written to (obviously) add labels to Guidelines.
 Additionally, it has the option to delete all guides (local or global). Vanilla required.
 
 """
-
 
 class LabelerWindow(object):
     """docstring for LabelerWindow"""

@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 # import sys
 
@@ -317,7 +318,7 @@ class QADemo(object):
             xAbove = font.info.xHeight + OVERSHOOT
             baseBelow = OVERSHOOT
 
-            print capAbove, xAbove, baseBelow
+            print(capAbove, xAbove, baseBelow)
 
             for g in font:
                 if g.name in OVERSHOOT_UC_ABOVE.get("round"):

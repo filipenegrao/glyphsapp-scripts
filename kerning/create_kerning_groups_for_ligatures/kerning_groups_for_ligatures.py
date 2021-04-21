@@ -1,7 +1,6 @@
 # MenuTitle: Add kerning groups for dlig glyphs
-# encoding: utf-8
-# Copyright: Filipe Negrão, 2018.
-
+# -*- coding: utf-8 -*-
+from __future__ import division, print_function, unicode_literals
 
 __doc__="""
 
@@ -42,7 +41,7 @@ for g in Font.selectedLayers:
             # Then, the new values (left and right) has to be added to the dictionary
             # e.g. DefaultKeys['E_Agrave.dlig'] = ['H', 'A'] 
             DefaultKeys[gname] = new_values
-            print "Added: \"%s\" : [\"%s\", \"%s\"]," % (gname, new_values[1], new_values[0])
+            print("Added: \"%s\" : [\"%s\", \"%s\"]," % (gname, new_values[1], new_values[0]))
 
 
 # calls the main() function from Georg's 'Set Kerning Group'

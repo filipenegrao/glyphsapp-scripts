@@ -1,5 +1,7 @@
 #MenuTitle: Diacritic Ligature Maker
 # -*- coding: utf-8 -*-
+from __future__ import division, print_function, unicode_literals
+
 __doc__="""
 For selected ligatures with appropriate anchors (top_1, top_2, etc.), all possible diacritic variations are created. E.g., A_h -> Adieresis_h, Aacute_h, A_hcircumflex, Adieresis_hcircumflex, etc.
 """
@@ -61,12 +63,12 @@ def createLigatureWithBaseLigature( newLigatureName, baseGlyphName ):
 					anchorBaseName = [ a.name[1:] for a in thisComponent.component.layers[thisFontMasterID].anchors if a.name in baseGlyphAnchorNameLists[i] ][0]
 					newAnchor = "%s_%i" % ( anchorBaseName, i+1 )
 				
-				print "       %s -> %s" % ( thisComponent.componentName, newAnchor )
+				print("       %s -> %s" % ( thisComponent.componentName, newAnchor ))
 				newComponent.setAnchor_( newAnchor )
 	
 def process( thisLigatureName ):
 	if not "_" in thisLigatureName:
-		print "    %s is not a ligature." % thisLigatureName
+		print("    %s is not a ligature." % thisLigatureName)
 		return None
 		
 	thisLigatureNameWithoutExtension = thisLigatureName.split(".")[0]
@@ -75,15 +77,15 @@ def process( thisLigatureName ):
 	listOfLigatures = [ n for n in allLigaturesFromNameLists( diacriticLetterLists ) if n != thisLigatureNameWithoutExtension ]
 	for diacriticLigatureName in listOfLigatures:
 		if not thisFont.glyphs[diacriticLigatureName]:
-			print "    Creating %s" % diacriticLigatureName
+			print("    Creating %s" % diacriticLigatureName)
 			try:
 				createLigatureWithBaseLigature( diacriticLigatureName, thisLigatureName )
 			except Exception as e:
-				print traceback.format_exc()
-				print "    Error: Could not create '%s' in all masters. Does '%s' have all necessary anchors?" % ( diacriticLigatureName, thisLigatureName )
+				print(traceback.format_exc())
+				print("    Error: Could not create '%s' in all masters. Does '%s' have all necessary anchors?" % ( diacriticLigatureName, thisLigatureName ))
 				# raise e
 		else:
-			print "    Skipping %s: already exists in font" % diacriticLigatureName
+			print("    Skipping %s: already exists in font" % diacriticLigatureName)
 	return listOfLigatures
 
 thisFont.disableUpdateInterface() # suppresses UI updates in Font View
@@ -94,7 +96,7 @@ for thisLayer in listOfSelectedLayers:
 	thisGlyph = thisLayer.parent
 	thisGlyphName = thisGlyph.name
 
-	print "Creating variations for %s:" % thisGlyphName
+	print("Creating variations for %s:" % thisGlyphName)
 	thisGlyph.beginUndo() # begin undo grouping
 	listOfLigatures = process( thisGlyphName )
 	if listOfLigatures:
@@ -103,4 +105,4 @@ for thisLayer in listOfSelectedLayers:
 
 thisFont.enableUpdateInterface() # re-enables UI updates in Font View
 
-print "\nCopy and paste this paragraph in an Edit Tab to see all ligatures mentioned above:\n\n/%s\n" % ( "/".join(allNewLigatures) )
+print("\nCopy and paste this paragraph in an Edit Tab to see all ligatures mentioned above:\n\n/%s\n" % ( "/".join(allNewLigatures) ))
