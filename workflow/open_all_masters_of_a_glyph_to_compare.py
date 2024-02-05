@@ -18,7 +18,7 @@ masters_name = [master.name for master in f.masters]
 glyph_name = glyph.name
 glyph_category = glyph.category
 
-folder_path = "/"
+folder_path = "./"
 # those files above are mandatory. I'm using a MIT word list for the English words and a USP word list for Portuguese.
 # https://www.mit.edu/~ecprice/wordlist.10000
 en = "mit_most_used_en.txt"
