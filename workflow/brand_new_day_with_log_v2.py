@@ -140,6 +140,8 @@ def change_font_name(familyName=FONT.familyName):
 
     new_font_name = f"{striped_date} {TODAY}"
     FONT.familyName = new_font_name
+    print(new_font_name)
+    print(FONT.familyName)
     return new_font_name
 
 
