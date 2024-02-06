@@ -1,6 +1,7 @@
 #MenuTitle: Copy glyph's foregrounds to backgrounds.
 # -*- coding: utf-8 -*-
 from __future__ import division, print_function, unicode_literals
+from __future__ import print_function
 
 __doc__="""
 
@@ -11,8 +12,6 @@ Comment the following line to avoid that: bg_layer.paths = []
 
 """
 
-
-from __future__ import print_function
 import copy
 import traceback
 
