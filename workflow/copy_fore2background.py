@@ -1,7 +1,5 @@
 #MenuTitle: Copy glyph's foregrounds to backgrounds.
 # -*- coding: utf-8 -*-
-from __future__ import division, print_function, unicode_literals
-from __future__ import print_function
 
 __doc__="""
 
@@ -12,25 +10,19 @@ Comment the following line to avoid that: bg_layer.paths = []
 
 """
 
-import copy
-import traceback
 
-
-font = Glyphs.font
-glyphs = font.glyphs
-
-# get active layer
-layer = font.selectedLayers[0]
-
-# get glyph of this layer
 glyph = layer.parent
 
-print(glyph)
+def remove_masters_backgrounds(glyph):
+	for layer in glyph.layers:
+		if layer.isMasterLayer:
+			layer.background = None
+			
+def add_foreground_to_bg(glyph):
+	for layer in glyph.layers:
+		if layer.isMasterLayer:
+			layer.background = layer.copy()
 
-for layer in glyph.layers:
-	print(layer)
-	bg_layer = layer.background
-	bg_layer.paths = []
-	for path in layer.paths:
-		new_path = path.copy()
-		bg_layer.paths.append(new_path)
+remove_masters_backgrounds(glyph)
+add_foreground_to_bg(glyph)
+Font.newTab(glyph.name)
