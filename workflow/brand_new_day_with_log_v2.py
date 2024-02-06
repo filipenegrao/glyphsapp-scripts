@@ -188,6 +188,7 @@ if not check_log_entry(LOG_FILE_MD, LAST_MODIFIED):
 # =========== notifications, open, close
 
 Glyphs.showNotification("Copy Current Font", "The current font's folder was copied to %s" % TODAYS_SOURCE)
+FONT.save()
 FONT.close()
 Glyphs.open(NEW_FILE_PATH)
 Glyphs.showMacroWindow()
