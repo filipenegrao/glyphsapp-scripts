@@ -4,12 +4,11 @@ from __future__ import division, print_function, unicode_literals
 
 __doc__ = """
 
+Working on this one.
 (GUI) No doc at the moment.
 **Pro tip:** Use Arrows Up and Down as shortcuts.
 
 """
-
-
 
 
 from AppKit import NSColor
@@ -17,7 +16,7 @@ from purenudge import nudgeMove
 
 font = Glyphs.font
 
-LAYER_NAME = 'xheigth-plugin-w'
+LAYER_NAME = "xheigth-plugin-w"
 
 XH = font.masters[0].xHeight
 AH = font.masters[0].ascender
@@ -28,6 +27,7 @@ HALF_XH = int(XH / 2)
 T = 20  # the tolerance, that needs to adapt for each font
 RAISE_AMOUNT = 10
 
+
 def draw_color(layer, info):
     r, g, b, a = 231 / 255.0, 227 / 255.0, 51 / 147.0, 50 / 100.0
     try:
@@ -35,6 +35,7 @@ def draw_color(layer, info):
         layer.background.bezierPath.fill()
     except:
         import traceback
+
         print(traceback.format_exc())
 
 
@@ -48,7 +49,8 @@ def create_new_layer(layer_name):
                     new_layer.name = layer_name
                     glyph.layers.append(new_layer)
                 else:
-                    print('The "{0}" layer already exists.'.format(layer_name))
+                    print(f'The "{layer_name}" layer already exists.')
+
 
 def draw_path(some_layer, list_coord):
     newPath = GSPath()
@@ -63,6 +65,7 @@ def draw_path(some_layer, list_coord):
     some_layer.paths.append(newPath)
     some_layer.bezierPath.fill()
 
+
 def initial_safezone_vertical(point1, point2):
     gname = glyph.name
     x1, x2 = point1, point2
@@ -76,6 +79,7 @@ def initial_safezone_vertical(point1, point2):
     print(gname, ((x1, y1), (x1, y2), (x2, y2), (x2, y1)))
     current_glyph_list = [(x1, y1), (x1, y2), (x2, y2), (x2, y1)]
     draw_path(bg, current_glyph_list)
+
 
 def initial_safezone_horizontal(point1, point2):
     gname = glyph.name
@@ -104,11 +108,10 @@ def list_points():
 
     for path in layer.paths:
         for node in path.nodes:
-            if node.type is OFFCURVE:
-                continue
-            else:
+            if node.type != OFFCURVE:
                 xlist.append(node.x)
                 ylist.append(node.y)
+
     return sorted(xlist), sorted(ylist)
 
 
@@ -118,15 +121,20 @@ def find_closest_points(a_list, a_number, num_of_points):
     a_number -> (int) a specific number that will be our base
     num_of_points -> (int) how many numbers we should looking for
     """
+    if not a_list:  # Verifica se a lista está vazia
+        print("🚨 Warning: empty list of closest points.")
+        return []
+
     closest_points = []
 
-    while num_of_points > 0:
-        closest_num = min(a_list, key=lambda x:abs(x-a_number))
+    while num_of_points > 0 and a_list:
+        closest_num = min(a_list, key=lambda x: abs(x - a_number))
         closest_points.append(closest_num)
         a_list.remove(closest_num)
         num_of_points -= 1
 
     return closest_points
+
 
 Glyphs.clearLog()
 
