@@ -22,3 +22,22 @@ def test_strip_date_handles_multiple_words():
 def test_today_str_format():
     import re
     assert re.match(r'\d{4}-\d{2}-\d{2}', bnd.today_str())
+
+import tempfile, shutil as _shutil
+
+def test_copy_snapshot_creates_dest(tmp_path):
+    src = tmp_path / "2026-05-19"
+    src.mkdir()
+    (src / "MyFont.glyphs").write_text("dummy")
+    dest = tmp_path / "2026-05-20"
+    bnd.copy_snapshot(src, dest)
+    assert (dest / "MyFont.glyphs").exists()
+
+def test_copy_snapshot_is_idempotent(tmp_path):
+    src = tmp_path / "src"
+    src.mkdir()
+    (src / "f.glyphs").write_text("x")
+    dest = tmp_path / "dest"
+    bnd.copy_snapshot(src, dest)
+    bnd.copy_snapshot(src, dest)  # second call must not raise
+    assert (dest / "f.glyphs").exists()

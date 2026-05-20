@@ -30,3 +30,10 @@ def today_str() -> str:
 def strip_date_from_name(family_name: str) -> str:
     """Remove trailing YYYY-MM-DD date from a font family name."""
     return re.sub(r'\s*\d{4}-\d{2}-\d{2}$', '', family_name).strip()
+
+
+def copy_snapshot(source: Path, dest: Path) -> None:
+    """Copy source folder to dest. No-op if dest already exists."""
+    if dest.exists():
+        return
+    shutil.copytree(source, dest)
