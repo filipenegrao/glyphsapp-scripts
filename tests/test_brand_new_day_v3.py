@@ -1,6 +1,7 @@
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'workflow'))
 from pathlib import Path
+import json
 
 import importlib, types
 
@@ -87,3 +88,37 @@ def test_compute_otf_diff_returns_none_when_file_missing():
         ["a"],
     )
     assert result is None
+
+
+def test_load_log_returns_empty_list_when_missing(tmp_path):
+    assert bnd.load_log(tmp_path / "log.json") == []
+
+def test_load_log_returns_entries(tmp_path):
+    log = tmp_path / "log.json"
+    log.write_text(json.dumps([{"date": "2026-05-19"}]))
+    assert bnd.load_log(log) == [{"date": "2026-05-19"}]
+
+def test_load_log_backs_up_corrupt_file(tmp_path):
+    log = tmp_path / "log.json"
+    log.write_text("NOT JSON {{{{")
+    result = bnd.load_log(log)
+    assert result == []
+    assert (tmp_path / "log.json.bak").exists()
+
+def test_upsert_log_entry_adds_new(tmp_path):
+    entries = [{"date": "2026-05-19", "font_name": "A"}]
+    new = {"date": "2026-05-20", "font_name": "B", "glyphs_changed": [], "glyphs_changed_count": 0, "otf_diff": None}
+    result = bnd.upsert_log_entry(entries, new)
+    assert len(result) == 2
+
+def test_upsert_log_entry_updates_existing(tmp_path):
+    existing = {"date": "2026-05-20", "font_name": "A", "glyphs_changed": [], "glyphs_changed_count": 0, "otf_diff": None}
+    updated  = {"date": "2026-05-20", "font_name": "B", "glyphs_changed": ["a"], "glyphs_changed_count": 1, "otf_diff": None}
+    result = bnd.upsert_log_entry([existing], updated)
+    assert len(result) == 1
+    assert result[0]["font_name"] == "B"
+
+def test_save_log_writes_valid_json(tmp_path):
+    log = tmp_path / "log.json"
+    bnd.save_log(log, [{"date": "2026-05-20"}])
+    assert json.loads(log.read_text()) == [{"date": "2026-05-20"}]

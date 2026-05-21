@@ -106,6 +106,34 @@ def compute_otf_diff(
     return diff or None
 
 
+def load_log(log_path: Path) -> list[dict]:
+    """Read log.json; return [] if missing. Back up and reset if corrupt."""
+    if not log_path.exists():
+        return []
+    try:
+        return json.loads(log_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        log_path.rename(log_path.with_suffix(".json.bak"))
+        return []
+
+
+def upsert_log_entry(entries: list[dict], new_entry: dict) -> list[dict]:
+    """Replace existing entry for the same date, or append if new."""
+    for i, e in enumerate(entries):
+        if e.get("date") == new_entry["date"]:
+            entries[i] = new_entry
+            return entries
+    entries.append(new_entry)
+    return entries
+
+
+def save_log(log_path: Path, entries: list[dict]) -> None:
+    log_path.write_text(
+        json.dumps(entries, indent=2, ensure_ascii=False),
+        encoding="utf-8",
+    )
+
+
 _GITIGNORE_CONTENT = """-OTFs/
 -logs/
 *.pyc
