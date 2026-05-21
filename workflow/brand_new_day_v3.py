@@ -356,9 +356,9 @@ def main() -> None:
     for instance in font.instances:
         instance.generate(FontPath=str(otf_folder))
 
-    # 7. Diff new vs previous OTF
+    # 7. Diff new vs previous OTF (representative: most recently generated instance)
     new_otfs = sorted(otf_folder.glob("*.otf"), key=lambda p: p.stat().st_mtime, reverse=True)
-    curr_otf = new_otfs[0] if new_otfs else None
+    curr_otf = new_otfs[0] if new_otfs else None  # diffs one instance; multi-instance fonts are partially covered
 
     otf_diff = None
     if prev_otf and curr_otf:
@@ -391,7 +391,7 @@ def main() -> None:
     Glyphs.showMacroWindow()  # type: ignore[name-defined]
 
     print("*" * 52)
-    print(f"Have a nice day!")
+    print("Have a nice day!")
     print(f"New folder:  {new_folder}")
     print(f"New font:    {new_font_path}")
     print(f"Dashboard:   {dashboard_path}")
