@@ -1,11 +1,17 @@
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'workflow'))
-from pathlib import Path
 import json
+import os
+import re
+import shutil as _shutil
+import subprocess
+import sys
+import tempfile
+import time
+from pathlib import Path
 
-import importlib, types
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'workflow'))
 
-# Stub out Glyphs so the module imports without crashing
+# Stub Glyphs so module imports without crashing outside Glyphs
+import types
 glyphs_stub = types.ModuleType('Glyphs')
 sys.modules.setdefault('Glyphs', glyphs_stub)
 
@@ -22,11 +28,7 @@ def test_strip_date_handles_multiple_words():
     assert bnd.strip_date_from_name("My Font Display 2025-01-01") == "My Font Display"
 
 def test_today_str_format():
-    import re
     assert re.match(r'\d{4}-\d{2}-\d{2}', bnd.today_str())
-
-import subprocess
-import tempfile, shutil as _shutil
 
 def test_copy_snapshot_creates_dest(tmp_path):
     src = tmp_path / "2026-05-19"
@@ -139,8 +141,6 @@ def test_generate_dashboard_html_embeds_data():
 def test_generate_dashboard_html_handles_empty_entries():
     html = bnd.generate_dashboard_html([])
     assert "<!DOCTYPE html>" in html
-
-import time
 
 def test_find_previous_otf_returns_none_when_folder_empty(tmp_path):
     assert bnd.find_previous_otf(tmp_path, tmp_path / "curr.otf") is None
