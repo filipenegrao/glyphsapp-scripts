@@ -14,6 +14,7 @@ import os
 import re
 import shutil
 import subprocess
+import tempfile
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -227,21 +228,9 @@ _HTML_TEMPLATE = """\
 
 def generate_dashboard_html(entries: list[dict]) -> str:
     data_json = json.dumps(entries, ensure_ascii=False)
-    return _HTML_TEMPLATE.format(data_json=data_json)
-
-
-def find_previous_otf(otf_folder: Path, current_otf: Path) -> Path | None:
-    """
-    Return the most recently modified OTF in otf_folder that is not current_otf.
-    Returns None if none found.
-    """
-    candidates = [
-        p for p in otf_folder.glob("*.otf")
-        if p.resolve() != current_otf.resolve()
-    ]
-    if not candidates:
-        return None
-    return max(candidates, key=lambda p: p.stat().st_mtime)
+    # Use replace() instead of format() to avoid KeyError when JSON contains braces
+    # Template still uses {{/}} escaping for readability; unescape after replacement
+    return _HTML_TEMPLATE.replace("{data_json}", data_json).replace("{{", "{").replace("}}", "}")
 
 
 _GITIGNORE_CONTENT = """-OTFs/
@@ -350,9 +339,12 @@ def main() -> None:
     logs_folder.mkdir(exist_ok=True)
 
     existing_otfs = sorted(otf_folder.glob("*.otf"), key=lambda p: p.stat().st_mtime, reverse=True)
-    prev_otf = existing_otfs[0] if existing_otfs else None
+    prev_otf_tmp: Path | None = None
+    if existing_otfs:
+        prev_otf_tmp = Path(tempfile.mktemp(suffix=".otf"))
+        shutil.copy2(str(existing_otfs[0]), str(prev_otf_tmp))
 
-    # 6. Generate OTFs
+    # 6. Generate OTFs (overwrites existing files)
     for instance in font.instances:
         instance.generate(FontPath=str(otf_folder))
 
@@ -361,8 +353,10 @@ def main() -> None:
     curr_otf = new_otfs[0] if new_otfs else None  # diffs one instance; multi-instance fonts are partially covered
 
     otf_diff = None
-    if prev_otf and curr_otf:
-        otf_diff = compute_otf_diff(prev_otf, curr_otf, changed_glyphs)
+    if prev_otf_tmp and curr_otf:
+        otf_diff = compute_otf_diff(prev_otf_tmp, curr_otf, changed_glyphs)
+    if prev_otf_tmp and prev_otf_tmp.exists():
+        prev_otf_tmp.unlink()
 
     # 8. Append to log.json
     entries = load_log(log_json_path)
