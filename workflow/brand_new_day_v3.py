@@ -230,6 +230,20 @@ def generate_dashboard_html(entries: list[dict]) -> str:
     return _HTML_TEMPLATE.format(data_json=data_json)
 
 
+def find_previous_otf(otf_folder: Path, current_otf: Path) -> Path | None:
+    """
+    Return the most recently modified OTF in otf_folder that is not current_otf.
+    Returns None if none found.
+    """
+    candidates = [
+        p for p in otf_folder.glob("*.otf")
+        if p.resolve() != current_otf.resolve()
+    ]
+    if not candidates:
+        return None
+    return max(candidates, key=lambda p: p.stat().st_mtime)
+
+
 _GITIGNORE_CONTENT = """-OTFs/
 -logs/
 *.pyc

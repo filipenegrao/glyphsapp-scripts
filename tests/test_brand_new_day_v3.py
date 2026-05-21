@@ -139,3 +139,18 @@ def test_generate_dashboard_html_embeds_data():
 def test_generate_dashboard_html_handles_empty_entries():
     html = bnd.generate_dashboard_html([])
     assert "<!DOCTYPE html>" in html
+
+import time
+
+def test_find_previous_otf_returns_none_when_folder_empty(tmp_path):
+    assert bnd.find_previous_otf(tmp_path, tmp_path / "curr.otf") is None
+
+def test_find_previous_otf_returns_older_file(tmp_path):
+    old = tmp_path / "MyFont-Regular-old.otf"
+    old.write_text("old")
+    time.sleep(0.05)
+    curr = tmp_path / "MyFont-Regular.otf"
+    curr.write_text("new")
+    # curr is the "just generated" file — previous should be old
+    result = bnd.find_previous_otf(tmp_path, curr)
+    assert result == old
