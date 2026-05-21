@@ -285,3 +285,124 @@ def git_commit_snapshot(
 
     msg = f"font: {today} snapshot — {n_changed} glyph{'s' if n_changed != 1 else ''} modified"
     run("commit", "-m", msg)
+
+
+# ---------------------------------------------------------------------------
+# Glyphs-dependent execution
+# ---------------------------------------------------------------------------
+
+def _get_changed_glyphs(font: Any, reference_date: Any) -> list[str]:
+    """Return names of glyphs whose lastChange matches reference_date."""
+    changed = []
+    for glyph in font.glyphs:
+        if glyph.lastChange is not None:
+            if glyph.lastChange.date() == reference_date:
+                changed.append(glyph.name)
+    return changed
+
+
+def main() -> None:
+    font = Glyphs.font  # type: ignore[name-defined]
+
+    if font is None or font.filepath is None:
+        Glyphs.showNotification(  # type: ignore[name-defined]
+            "Brand New Day v3",
+            "No font open or font has not been saved yet.",
+        )
+        return
+
+    today = today_str()
+    font_path      = Path(font.filepath)
+    current_folder = font_path.parent
+    root           = current_folder.parent
+    new_folder     = root / today
+    new_font_path  = new_folder / font_path.name
+    otf_folder     = root / "-OTFs"
+    logs_folder    = root / "-logs"
+    log_json_path  = logs_folder / "log.json"
+    dashboard_path = logs_folder / "dashboard.html"
+
+    # 1. Snapshot
+    copy_snapshot(current_folder, new_folder)
+
+    # 2. Rename font, save, close, open new
+    base_name = strip_date_from_name(font.familyName)
+    font.familyName = f"{base_name} {today}"
+    font.save()
+    font.close()
+    Glyphs.open(str(new_font_path))  # type: ignore[name-defined]
+    font = Glyphs.font  # type: ignore[name-defined]
+
+    # 3. Collect changed glyphs
+    last_modified_date = datetime.fromtimestamp(
+        os.path.getmtime(str(new_font_path))
+    ).date()
+    changed_glyphs = _get_changed_glyphs(font, last_modified_date)
+
+    # 4. Git snapshot
+    try:
+        git_commit_snapshot(root, new_font_path, len(changed_glyphs), today)
+    except Exception as e:
+        print(f"[brand_new_day_v3] git step skipped: {e}")
+
+    # 5. Prepare folders and find previous OTF for diff
+    otf_folder.mkdir(exist_ok=True)
+    logs_folder.mkdir(exist_ok=True)
+
+    existing_otfs = sorted(otf_folder.glob("*.otf"), key=lambda p: p.stat().st_mtime, reverse=True)
+    prev_otf = existing_otfs[0] if existing_otfs else None
+
+    # 6. Generate OTFs
+    for instance in font.instances:
+        instance.generate(FontPath=str(otf_folder))
+
+    # 7. Diff new vs previous OTF
+    new_otfs = sorted(otf_folder.glob("*.otf"), key=lambda p: p.stat().st_mtime, reverse=True)
+    curr_otf = new_otfs[0] if new_otfs else None
+
+    otf_diff = None
+    if prev_otf and curr_otf:
+        otf_diff = compute_otf_diff(prev_otf, curr_otf, changed_glyphs)
+
+    # 8. Append to log.json
+    entries = load_log(log_json_path)
+    new_entry = {
+        "date":                 today,
+        "font_name":            font.familyName,
+        "font_path":            str(new_font_path),
+        "glyphs_changed":       changed_glyphs,
+        "glyphs_changed_count": len(changed_glyphs),
+        "otf_diff":             otf_diff,
+    }
+    entries = upsert_log_entry(entries, new_entry)
+    save_log(log_json_path, entries)
+
+    # 9. Regenerate dashboard.html
+    dashboard_path.write_text(
+        generate_dashboard_html(entries),
+        encoding="utf-8",
+    )
+
+    # 10. Notify
+    Glyphs.showNotification(  # type: ignore[name-defined]
+        "Brand New Day v3",
+        f"Snapshot ready: {new_folder.name} · {len(changed_glyphs)} glyphs changed",
+    )
+    Glyphs.showMacroWindow()  # type: ignore[name-defined]
+
+    print("*" * 52)
+    print(f"Have a nice day!")
+    print(f"New folder:  {new_folder}")
+    print(f"New font:    {new_font_path}")
+    print(f"Dashboard:   {dashboard_path}")
+    print(f"Glyphs changed today ({len(changed_glyphs)}): {', '.join(changed_glyphs) or 'none'}")
+    print(f"OTF diff:    {'yes' if otf_diff else 'no'}")
+    print("*" * 52)
+
+
+# Run when executed inside Glyphs
+try:
+    Glyphs  # type: ignore[name-defined]
+    main()
+except NameError:
+    pass  # running outside Glyphs (e.g. during tests) — do nothing
