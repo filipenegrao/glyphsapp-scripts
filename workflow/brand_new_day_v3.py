@@ -48,7 +48,7 @@ def copy_snapshot(source: Path, dest: Path) -> None:
 
 
 def _glyph_stats(ttfont: Any, glyph_name: str) -> dict[str, Any] | None:
-    """Return point count and bounding box for a glyph. Requires fonttools."""
+    """Return point count and bounding box for a glyph, or None if glyph not in font."""
     glyph_set = ttfont.getGlyphSet()
     if glyph_name not in glyph_set:
         return None
@@ -83,21 +83,26 @@ def compute_otf_diff(
     try:
         prev_font = TTFont(str(prev_otf))
         curr_font = TTFont(str(curr_otf))
-    except Exception:
+    except Exception:  # corrupt or unreadable font file
         return None
 
     diff: dict[str, Any] = {}
-    for name in changed_glyphs:
-        prev_stats = _glyph_stats(prev_font, name)
-        curr_stats = _glyph_stats(curr_font, name)
-        if prev_stats is None and curr_stats is None:
-            continue
-        diff[name] = {
-            "points_before": prev_stats["points"] if prev_stats else None,
-            "points_after":  curr_stats["points"]  if curr_stats  else None,
-            "bbox_before":   prev_stats["bbox"]    if prev_stats else None,
-            "bbox_after":    curr_stats["bbox"]    if curr_stats  else None,
-        }
+    try:
+        for name in changed_glyphs:
+            prev_stats = _glyph_stats(prev_font, name)
+            curr_stats = _glyph_stats(curr_font, name)
+            if prev_stats is None and curr_stats is None:
+                continue
+            diff[name] = {
+                "points_before": prev_stats["points"] if prev_stats else None,
+                "points_after":  curr_stats["points"]  if curr_stats  else None,
+                "bbox_before":   prev_stats["bbox"]    if prev_stats else None,
+                "bbox_after":    curr_stats["bbox"]    if curr_stats  else None,
+            }
+    finally:
+        prev_font.close()
+        curr_font.close()
+
     return diff or None
 
 
