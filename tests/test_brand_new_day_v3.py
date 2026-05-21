@@ -23,6 +23,7 @@ def test_today_str_format():
     import re
     assert re.match(r'\d{4}-\d{2}-\d{2}', bnd.today_str())
 
+import subprocess
 import tempfile, shutil as _shutil
 
 def test_copy_snapshot_creates_dest(tmp_path):
@@ -41,3 +42,33 @@ def test_copy_snapshot_is_idempotent(tmp_path):
     bnd.copy_snapshot(src, dest)
     bnd.copy_snapshot(src, dest)  # second call must not raise
     assert (dest / "f.glyphs").exists()
+
+
+def test_git_commit_snapshot_inits_and_commits(tmp_path):
+    repo = tmp_path / "font-project"
+    repo.mkdir()
+    dated = repo / "2026-05-20"
+    dated.mkdir()
+    glyphs_file = dated / "MyFont.glyphs"
+    glyphs_file.write_text("glyphs data")
+
+    bnd.git_commit_snapshot(repo, glyphs_file, n_changed=3, today="2026-05-20")
+
+    result = subprocess.run(
+        ["git", "-C", str(repo), "log", "--oneline"],
+        capture_output=True, text=True
+    )
+    assert "2026-05-20 snapshot" in result.stdout
+
+def test_git_commit_snapshot_skips_when_nothing_staged(tmp_path):
+    repo = tmp_path / "font-project"
+    repo.mkdir()
+    dated = repo / "2026-05-20"
+    dated.mkdir()
+    glyphs_file = dated / "MyFont.glyphs"
+    glyphs_file.write_text("glyphs data")
+
+    # First commit
+    bnd.git_commit_snapshot(repo, glyphs_file, n_changed=3, today="2026-05-20")
+    # Second call same file, same content — should not raise
+    bnd.git_commit_snapshot(repo, glyphs_file, n_changed=3, today="2026-05-20")

@@ -37,3 +37,46 @@ def copy_snapshot(source: Path, dest: Path) -> None:
     if dest.exists():
         return
     shutil.copytree(source, dest)
+
+
+_GITIGNORE_CONTENT = """-OTFs/
+-logs/
+*.pyc
+"""
+
+
+def git_commit_snapshot(
+    root: Path,
+    glyphs_file: Path,
+    n_changed: int,
+    today: str,
+) -> None:
+    """Init git repo at root if needed, then commit the .glyphs file."""
+    git = ["git", "-C", str(root)]
+
+    def run(*args: str) -> subprocess.CompletedProcess:
+        return subprocess.run(
+            [*git, *args],
+            capture_output=True,
+            text=True,
+        )
+
+    if not (root / ".git").exists():
+        run("init")
+        run("config", "user.email", "glyphs-script@local")
+        run("config", "user.name", "Brand New Day")
+        gitignore = root / ".gitignore"
+        if not gitignore.exists():
+            gitignore.write_text(_GITIGNORE_CONTENT)
+        run("add", ".gitignore")
+        run("commit", "-m", "chore: init font project repo")
+
+    rel = glyphs_file.relative_to(root)
+    run("add", str(rel))
+
+    status = run("status", "--porcelain")
+    if not status.stdout.strip():
+        return  # nothing staged
+
+    msg = f"font: {today} snapshot — {n_changed} glyph{'s' if n_changed != 1 else ''} modified"
+    run("commit", "-m", msg)
