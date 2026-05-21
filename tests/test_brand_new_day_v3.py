@@ -122,3 +122,20 @@ def test_save_log_writes_valid_json(tmp_path):
     log = tmp_path / "log.json"
     bnd.save_log(log, [{"date": "2026-05-20"}])
     assert json.loads(log.read_text()) == [{"date": "2026-05-20"}]
+
+def test_generate_dashboard_html_returns_string():
+    entries = [{"date": "2026-05-20", "font_name": "MyFont 2026-05-20",
+                "glyphs_changed": ["a", "b"], "glyphs_changed_count": 2, "otf_diff": None}]
+    html = bnd.generate_dashboard_html(entries)
+    assert isinstance(html, str)
+    assert "<!DOCTYPE html>" in html
+
+def test_generate_dashboard_html_embeds_data():
+    entries = [{"date": "2026-05-20", "font_name": "MyFont",
+                "glyphs_changed": ["ampersand"], "glyphs_changed_count": 1, "otf_diff": None}]
+    html = bnd.generate_dashboard_html(entries)
+    assert "ampersand" in html
+
+def test_generate_dashboard_html_handles_empty_entries():
+    html = bnd.generate_dashboard_html([])
+    assert "<!DOCTYPE html>" in html

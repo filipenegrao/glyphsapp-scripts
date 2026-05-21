@@ -134,6 +134,102 @@ def save_log(log_path: Path, entries: list[dict]) -> None:
     )
 
 
+_HTML_TEMPLATE = """\
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Type Design Dashboard</title>
+  <style>
+    *{{box-sizing:border-box;margin:0;padding:0}}
+    body{{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',monospace;
+          background:#0d0d0d;color:#e0e0e0;padding:2rem}}
+    h1{{font-size:1.5rem;font-weight:600;margin-bottom:.25rem}}
+    .sub{{color:#888;font-size:.85rem;margin-bottom:2rem}}
+    .session{{border:1px solid #222;border-radius:6px;margin-bottom:1rem;overflow:hidden}}
+    .sh{{display:flex;align-items:center;gap:1rem;padding:.75rem 1rem;
+         cursor:pointer;background:#161616}}
+    .sh:hover{{background:#1e1e1e}}
+    .dot{{width:12px;height:12px;border-radius:50%;flex-shrink:0}}
+    .sdate{{font-weight:600;font-size:.9rem}}
+    .scount{{color:#888;font-size:.8rem;margin-left:auto}}
+    .sb{{padding:1rem;display:none;border-top:1px solid #222}}
+    .sb.open{{display:block}}
+    .gl{{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1rem}}
+    .gt{{background:#222;border-radius:3px;padding:.2rem .5rem;
+         font-size:.78rem;font-family:monospace}}
+    table{{width:100%;border-collapse:collapse;font-size:.82rem}}
+    th{{text-align:left;color:#666;font-weight:500;padding:.4rem .5rem;
+        border-bottom:1px solid #222}}
+    td{{padding:.4rem .5rem;border-bottom:1px solid #111;font-family:monospace}}
+    .up{{color:#4ade80}}.down{{color:#f87171}}.same{{color:#666}}
+    .nd{{color:#444;font-style:italic;font-size:.82rem}}
+  </style>
+</head>
+<body>
+  <h1 id="fn"></h1>
+  <div class="sub" id="sub"></div>
+  <div id="sessions"></div>
+  <script>
+    const DATA={data_json};
+    function dotColor(n){{return n===0?'#333':n<5?'#3b82f6':n<20?'#8b5cf6':'#f59e0b'}}
+    function dc(a,b){{return a===null||b===null?'same':a<b?'up':a>b?'down':'same'}}
+    function ds(a,b){{
+      if(a===null||b===null)return'—';
+      const d=b-a;return d===0?'\xb10':(d>0?'+':'')+d
+    }}
+    function renderDiff(diff){{
+      if(!diff||!Object.keys(diff).length)
+        return'<p class="nd">No OTF diff for this session.</p>';
+      const rows=Object.entries(diff).map(([n,d])=>{{
+        const pc=dc(d.points_before,d.points_after);
+        const bw_prev=d.bbox_before?d.bbox_before[2]-d.bbox_before[0]:null;
+        const bw_curr=d.bbox_after?d.bbox_after[2]-d.bbox_after[0]:null;
+        return`<tr><td>${{n}}</td>
+          <td>${{d.points_before??'—'}}→${{d.points_after??'—'}}
+            <span class="${{pc}}">(${{ds(d.points_before,d.points_after)}})</span></td>
+          <td class="${{dc(bw_prev,bw_curr)}}">${{ds(bw_prev,bw_curr)}}</td></tr>`;
+      }}).join('');
+      return`<table><thead><tr><th>Glyph</th><th>Points</th><th>Width Δ</th></tr></thead>
+        <tbody>${{rows}}</tbody></table>`;
+    }}
+    function render(){{
+      if(!DATA.length){{document.body.innerHTML+='<p style="color:#444;margin-top:2rem">No sessions yet.</p>';return}}
+      const latest=DATA[DATA.length-1];
+      document.getElementById('fn').textContent=latest.font_name;
+      document.getElementById('sub').textContent=
+        `Last updated: ${{latest.date}} \xb7 ${{DATA.length}} session${{DATA.length!==1?'s':''}}`;
+      const c=document.getElementById('sessions');
+      [...DATA].reverse().forEach((s,i)=>{{
+        const n=s.glyphs_changed_count||0,id='s'+i;
+        const div=document.createElement('div');
+        div.className='session';
+        div.innerHTML=`
+          <div class="sh" onclick="toggle('${{id}}')">
+            <div class="dot" style="background:${{dotColor(n)}}"></div>
+            <span class="sdate">${{s.date}}</span>
+            <span class="scount">${{n}} glyph${{n!==1?'s':''}} changed</span>
+          </div>
+          <div class="sb" id="${{id}}">
+            <div class="gl">${{(s.glyphs_changed||[]).map(g=>`<span class="gt">${{g}}</span>`).join('')}}</div>
+            ${{renderDiff(s.otf_diff)}}
+          </div>`;
+        c.appendChild(div);
+      }});
+    }}
+    function toggle(id){{document.getElementById(id).classList.toggle('open')}}
+    render();
+  </script>
+</body>
+</html>"""
+
+
+def generate_dashboard_html(entries: list[dict]) -> str:
+    data_json = json.dumps(entries, ensure_ascii=False)
+    return _HTML_TEMPLATE.format(data_json=data_json)
+
+
 _GITIGNORE_CONTENT = """-OTFs/
 -logs/
 *.pyc
