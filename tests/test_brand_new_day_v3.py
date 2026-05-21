@@ -1,5 +1,6 @@
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'workflow'))
+from pathlib import Path
 
 import importlib, types
 
@@ -72,3 +73,17 @@ def test_git_commit_snapshot_skips_when_nothing_staged(tmp_path):
     bnd.git_commit_snapshot(repo, glyphs_file, n_changed=3, today="2026-05-20")
     # Second call same file, same content — should not raise
     bnd.git_commit_snapshot(repo, glyphs_file, n_changed=3, today="2026-05-20")
+
+
+def test_compute_otf_diff_returns_none_without_fonttools(monkeypatch):
+    monkeypatch.setattr(bnd, '_FONTTOOLS_AVAILABLE', False)
+    result = bnd.compute_otf_diff(Path("a.otf"), Path("b.otf"), ["a", "b"])
+    assert result is None
+
+def test_compute_otf_diff_returns_none_when_file_missing():
+    result = bnd.compute_otf_diff(
+        Path("/nonexistent/prev.otf"),
+        Path("/nonexistent/curr.otf"),
+        ["a"],
+    )
+    assert result is None

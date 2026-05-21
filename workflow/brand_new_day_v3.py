@@ -18,6 +18,14 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+try:
+    from fonttools.ttLib import TTFont
+    from fonttools.pens.boundsPen import BoundsPen
+    from fonttools.pens.recordingPen import RecordingPen
+    _FONTTOOLS_AVAILABLE = True
+except ImportError:
+    _FONTTOOLS_AVAILABLE = False
+
 
 # ---------------------------------------------------------------------------
 # Pure utilities
@@ -37,6 +45,60 @@ def copy_snapshot(source: Path, dest: Path) -> None:
     if dest.exists():
         return
     shutil.copytree(source, dest)
+
+
+def _glyph_stats(ttfont: Any, glyph_name: str) -> dict[str, Any] | None:
+    """Return point count and bounding box for a glyph. Requires fonttools."""
+    glyph_set = ttfont.getGlyphSet()
+    if glyph_name not in glyph_set:
+        return None
+    rec = RecordingPen()
+    bp = BoundsPen(glyph_set)
+    glyph_set[glyph_name].draw(rec)
+    glyph_set[glyph_name].draw(bp)
+    points = sum(
+        len(args)
+        for op, args in rec.value
+        if op in ("moveTo", "lineTo", "curveTo", "qCurveTo")
+    )
+    return {
+        "points": points,
+        "bbox": list(bp.bounds) if bp.bounds else None,
+    }
+
+
+def compute_otf_diff(
+    prev_otf: Path,
+    curr_otf: Path,
+    changed_glyphs: list[str],
+) -> dict[str, Any] | None:
+    """
+    Compare glyph outlines between two OTF files.
+    Returns None if fonttools is unavailable or either file is missing.
+    """
+    if not _FONTTOOLS_AVAILABLE:
+        return None
+    if not prev_otf.exists() or not curr_otf.exists():
+        return None
+    try:
+        prev_font = TTFont(str(prev_otf))
+        curr_font = TTFont(str(curr_otf))
+    except Exception:
+        return None
+
+    diff: dict[str, Any] = {}
+    for name in changed_glyphs:
+        prev_stats = _glyph_stats(prev_font, name)
+        curr_stats = _glyph_stats(curr_font, name)
+        if prev_stats is None and curr_stats is None:
+            continue
+        diff[name] = {
+            "points_before": prev_stats["points"] if prev_stats else None,
+            "points_after":  curr_stats["points"]  if curr_stats  else None,
+            "bbox_before":   prev_stats["bbox"]    if prev_stats else None,
+            "bbox_after":    curr_stats["bbox"]    if curr_stats  else None,
+        }
+    return diff or None
 
 
 _GITIGNORE_CONTENT = """-OTFs/
