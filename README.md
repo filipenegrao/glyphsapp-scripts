@@ -2,6 +2,9 @@
 This repository is a collection of useful (or not) Glyphs App scripts. Check out how some of then work on [Vimeo](https://vimeo.com/album/4932608).
 Drop me a line if you need any help.
 
+## Components
+* **Disable Auto-Alignment for Selected Glyphs (All Masters)**: Disables automatic alignment (`disableAlignment` + `automaticAlignment`) for every component in all master layers of the selected glyphs. Works from both Font view (grid selection) and Edit view (tab selection).
+
 ## Data Extractors
 * **Save vertical metrics data**: Save vertical metrics data: Takes the vertical metrics data and saves it in a .cvs file for further analysis. I wrote this to compare the data between typefaces of the same style.
 
