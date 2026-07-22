@@ -1,19 +1,15 @@
 # MenuTitle: Label Guidelines
 # -*- coding: utf-8 -*-
 
-from __future__ import division, print_function, unicode_literals
 from vanilla import *
 import GlyphsApp
 
 __doc__ = """
-
 (GUI) Label Guidelines was written to (obviously) add labels to Guidelines.
 Additionally, it has the option to delete all guides (local or global). Vanilla required.
-
 """
 
 class LabelerWindow(object):
-    """docstring for LabelerWindow"""
 
     def __init__(self):
         super(LabelerWindow, self).__init__()
@@ -49,17 +45,16 @@ class LabelerWindow(object):
             'descender': font.selectedFontMaster.descender,
             'cap_height': font.selectedFontMaster.capHeight
         }
-
         return metrics_dict
 
     def buttonAddLabelCallback(self, sender):
         try:
-            if len(Layer.selection) == 1 and type(Layer.selection[0]) == GSGuide:
-                Layer.selection[0].name = self.w.box.editText.get()
+            layer = Glyphs.font.selectedLayers[0]
+            if len(layer.selection) == 1 and type(layer.selection[0]) == GSGuide:
+                layer.selection[0].name = self.w.box.editText.get()
                 Glyphs.redraw()
             else:
-                Message('Labeler', 'Select a guideline first :)',
-                        OKButton=None)
+                Message('Labeler', 'Select a guideline first :)', OKButton=None)
         except Exception as e:
             raise e
 
@@ -72,7 +67,6 @@ class LabelerWindow(object):
             Glyphs.redraw()
         except Exception as e:
             raise e
-            Glyphs.showMacroWindow()
 
     def deleteGlobalCallback(self, sender):
         font = Glyphs.font
@@ -83,11 +77,10 @@ class LabelerWindow(object):
     def deleteLocalCallback(self, sender):
         for layer in Glyphs.font.selectedLayers:
             glyph = layer.parent
-
-        # delete guidelines:
-        glyph.beginUndo()
-        layer.guides = []
-        glyph.endUndo()
+            glyph.beginUndo()
+            layer.guides = []
+            glyph.endUndo()
+        Glyphs.redraw()
 
 
 LabelerWindow()
