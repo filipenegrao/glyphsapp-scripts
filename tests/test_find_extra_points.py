@@ -7,10 +7,9 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'paths'))
 
 import find_extra_points_across_masters as fx
 
-OFF = fx.node_token("offcurve", False)
-SMOOTH = fx.node_token("curve", True)
-CORNER = fx.node_token("curve", False)
-LINE = fx.node_token("line", False)
+OFF = fx.node_token("offcurve")
+CURVE = fx.node_token("curve")
+LINE = fx.node_token("line")
 
 
 def master(name, paths, components=None, anchors=None, shape_kinds=None,
@@ -28,7 +27,7 @@ def master(name, paths, components=None, anchors=None, shape_kinds=None,
 
 
 def rounded_rect():
-    """A rounded rectangle: 4 corners, a smooth node midway down each stem.
+    """A rounded rectangle: a corner, then a node midway down each stem.
 
     Models the shape from the reported bug — the contour whose extra nodes
     were being blamed on the wrong nodes.
@@ -44,8 +43,8 @@ def rounded_rect():
         def along(fraction):
             return (x + (next_x - x) * fraction, y + (next_y - y) * fraction)
 
-        for fraction, token in ((0.0, CORNER), (0.2, OFF), (0.35, OFF),
-                                (0.5, SMOOTH), (0.65, OFF), (0.8, OFF)):
+        for fraction, token in ((0.0, CURVE), (0.2, OFF), (0.35, OFF),
+                                (0.5, CURVE), (0.65, OFF), (0.8, OFF)):
             points.append(along(fraction))
             tokens.append(token)
     return tokens, points
@@ -55,17 +54,29 @@ def splice_segment(tokens, points, at):
     """Insert an extra smooth node and its two off-curves before index `at`."""
     previous, current = points[at - 1], points[at]
     middle = ((previous[0] + current[0]) / 2, (previous[1] + current[1]) / 2)
-    return (tokens[:at] + [OFF, OFF, SMOOTH] + tokens[at:],
+    return (tokens[:at] + [OFF, OFF, CURVE] + tokens[at:],
             points[:at] + [middle, middle, middle] + points[at:])
 
 
 # --- node_token ----------------------------------------------------------
-def test_smooth_and_corner_nodes_are_different_tokens():
-    assert fx.node_token("curve", True) != fx.node_token("curve", False)
+def test_line_and_curve_are_different_tokens():
+    assert fx.node_token("line") != fx.node_token("curve")
 
 
-def test_offcurves_ignore_the_smooth_flag():
-    assert fx.node_token("offcurve", True) == fx.node_token("offcurve", False)
+def test_token_is_just_the_type():
+    assert fx.node_token("curve") == "curve"
+
+
+# --- marker --------------------------------------------------------------
+def test_marker_is_invisible():
+    """It is appended to the annotation label, so it must not print.
+
+    It used to read "xp", which showed up as "3 extra node(s) vs. Thinxp"
+    on the layer.
+    """
+    assert fx.MARKER
+    assert all(ord(character) in (0x2060, 0x2061, 0x2062, 0x2063, 0x200B)
+               for character in fx.MARKER)
 
 
 # --- normalized_positions ------------------------------------------------
@@ -119,8 +130,6 @@ def test_two_extra_segments_on_opposite_stems_are_both_located():
         fx.normalized_positions(points),
         fx.normalized_positions(other_points))
     assert found == [4, 5, 6, 19, 20, 21]
-    # And never on a corner node, which is what went wrong in Glyphs.
-    assert all(other_tokens[index] != CORNER for index in found)
 
 
 def test_positions_are_what_makes_the_location_right():
@@ -130,6 +139,29 @@ def test_positions_are_what_makes_the_location_right():
     found = fx.extra_node_indexes(tokens, other_tokens)
     assert len(found) == 3
     assert found != [10, 11, 12]
+
+
+def test_a_smooth_corner_flip_is_not_an_extra_node():
+    """Reported bug: a corner node was arrowed, and the count went 2 -> 3.
+
+    Glyphs ignores the corner/smooth flag for compatibility, so a node set
+    to corner in one master and smooth in another must still match — folding
+    the flag into the token made it unmatchable and the alignment invented an
+    extra node to explain it.
+    """
+    # The mechanism: the flag cannot reach the comparison at all.
+    assert fx.node_token("curve") == fx.node_token("curve")
+
+    # A master carrying one spliced segment must report that segment only,
+    # however its nodes are set to corner or smooth.
+    tokens, points = rounded_rect()
+    other_tokens, other_points = splice_segment(tokens, points, 16)
+    found = fx.extra_node_indexes(
+        tokens, other_tokens,
+        fx.normalized_positions(points),
+        fx.normalized_positions(other_points))
+    assert found == [16, 17, 18]
+    assert len(found) == len(other_tokens) - len(tokens)
 
 
 def test_extra_count_is_minimal():
@@ -144,8 +176,8 @@ def test_empty_reference_marks_everything_as_extra():
 
 # --- rotation / direction ------------------------------------------------
 def test_rotation_offset_detects_shifted_start_point():
-    reference = [LINE, OFF, OFF, SMOOTH]
-    other = [OFF, OFF, SMOOTH, LINE]
+    reference = [LINE, OFF, OFF, CURVE]
+    other = [OFF, OFF, CURVE, LINE]
     assert fx.rotation_offset(reference, other) == 3
 
 
@@ -154,8 +186,8 @@ def test_rotation_offset_none_for_different_lengths():
 
 
 def test_reversed_path_is_detected():
-    reference = [LINE, LINE, SMOOTH, OFF]
-    other = [OFF, SMOOTH, LINE, LINE]
+    reference = [LINE, LINE, CURVE, OFF]
+    other = [OFF, CURVE, LINE, LINE]
     assert fx.is_reversed_match(reference, other) is True
 
 
@@ -190,8 +222,8 @@ def test_diagnose_locates_the_extra_nodes_of_the_heavy_master():
 
 
 def test_diagnose_works_without_positions():
-    light = master("Light", [[LINE, OFF, OFF, SMOOTH]])
-    bold = master("Bold", [[LINE, LINE, OFF, OFF, SMOOTH]])
+    light = master("Light", [[LINE, OFF, OFF, CURVE]])
+    bold = master("Bold", [[LINE, LINE, OFF, OFF, CURVE]])
     report = fx.diagnose([light, bold])
     assert len(report["extras"][1]) == 1
 
@@ -204,8 +236,8 @@ def test_path_count_mismatch_is_reported():
 
 
 def test_start_point_mismatch_is_not_reported_as_extra_nodes():
-    light = master("Light", [[LINE, OFF, OFF, SMOOTH]])
-    bold = master("Bold", [[OFF, OFF, SMOOTH, LINE]])
+    light = master("Light", [[LINE, OFF, OFF, CURVE]])
+    bold = master("Bold", [[OFF, OFF, CURVE, LINE]])
     report = fx.diagnose([light, bold])
     assert report["extras"] == {}
     assert any("starts" in issue for issue in report["issues"])

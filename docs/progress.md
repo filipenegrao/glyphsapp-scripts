@@ -14,8 +14,13 @@ Checklist of the work done in this repository. Newest on top.
       minimal alignment tied and the backtrack picked an arbitrary one — right
       count, wrong place. Nodes now carry their corner/smooth flag and ties are
       settled by normalized position along the contour.
-- [ ] Re-run inside Glyphs on the ExtraBold that reported 2 extra nodes and
-      confirm both arrows land on the stems, not on the top-left corner.
+- [x] Fixed: a corner node was arrowed and the count went 2 -> 3. Folding the
+      corner/smooth flag into the comparison made a node that is corner in one
+      master and smooth in another unmatchable, so the alignment invented an
+      extra node. Glyphs ignores that flag for compatibility (compareString is
+      "l"/"c"/"o" only) and so do we now.
+- [ ] Re-run inside Glyphs on that ExtraBold and confirm exactly 2 arrows, both
+      on the stems.
 - [ ] The Glyphs side (annotation placement, userData cleanup, scope) still has
       no coverage — only the alignment is tested.
 

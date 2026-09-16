@@ -13,10 +13,13 @@ delete.
 
 Comparing node types alone is not enough: a rounded contour reads as
 "oocoocooc...", so every alignment that drops the same number of nodes ties and
-the extra points end up blamed on the wrong nodes. So each node is compared by
-type AND corner/smooth, and the tie is settled by how far apart the nodes sit
-along their contour — which is the part that stays proportional between
-compatible masters.
+the extra points end up blamed on the wrong nodes. The tie is settled by how far
+apart the nodes sit along their contour, which is the part that stays
+proportional between compatible masters.
+
+The corner/smooth flag is left out of the comparison on purpose — Glyphs
+ignores it for compatibility as well, and a node set to corner in one master
+and smooth in another is not an extra node.
 
 It also reports the other classic incompatibility causes:
 path count, start point / direction, component count & order, anchors.
@@ -47,7 +50,7 @@ except ImportError:  # importable outside Glyphs, for the tests
 #  by this script are bookkept in layer.userData, which is what allows the
 #  cleanup on re-runs. The .text marker below is a second net.
 TAG = "com.filipenegrao.extraPoints"
-MARKER = "⁣xp⁣"          # invisible separators, never typed by hand
+MARKER = "⁣⁣⁣"       # invisible separators, never typed by hand
 SKIP_NON_EXPORTING = True
 OPEN_TAB = True
 
@@ -55,24 +58,24 @@ OPEN_TAB = True
 # ---------------------------------------------------------------
 #  Pure helpers (no Glyphs API — covered by tests/)
 # ---------------------------------------------------------------
-def node_token(node_type, smooth):
+def node_token(node_type):
     """Build the symbol used to compare a node across masters.
 
-    The bare node type is too coarse: a rounded contour reads as
-    "oocoocooc...", so every node looks the same and the diff cannot tell
-    which one is extra. Folding in the corner/smooth flag separates the
-    corners — which stay put across masters — from the smooth nodes.
+    Only the node type counts. The corner/smooth flag is deliberately left
+    out: Glyphs ignores it for compatibility too (its own compareString is
+    built from "l", "c" and "o" alone), and a node set to corner in one
+    master and smooth in another still interpolates. Folding the flag in
+    makes those nodes unmatchable, and the alignment then has to invent an
+    extra node to explain the difference — pointing an arrow at a node that
+    is not extra at all.
 
     Args:
         node_type: The GSNode type, "line", "curve", "offcurve" or "qcurve".
-        smooth: Whether the node is a smooth connection.
 
     Returns:
         The token as a string.
     """
-    if node_type == "offcurve":
-        return "offcurve"
-    return "%s|%s" % (node_type, "smooth" if smooth else "corner")
+    return str(node_type)
 
 
 def normalized_positions(points):
@@ -362,8 +365,7 @@ def collect_layer_info(layer, master_name):
     for shape in layer.shapes:
         if isinstance(shape, GSPath):
             info["paths"].append([
-                node_token(str(node.type), bool(node.smooth))
-                for node in shape.nodes])
+                node_token(node.type) for node in shape.nodes])
             info["path_positions"].append(normalized_positions([
                 (node.position.x, node.position.y) for node in shape.nodes]))
             info["node_count"] += len(shape.nodes)
