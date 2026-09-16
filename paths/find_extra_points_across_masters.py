@@ -51,6 +51,10 @@ except ImportError:  # importable outside Glyphs, for the tests
 #  cleanup on re-runs. The .text marker below is a second net.
 TAG = "com.filipenegrao.extraPoints"
 MARKER = "⁣⁣⁣"       # invisible separators, never typed by hand
+#  How much a corner/smooth difference weighs against the distance along the
+#  contour. It only ever picks between alignments that drop the same number of
+#  nodes, so it can never change the count — see extra_node_indexes().
+SMOOTH_PENALTY = 0.15
 SKIP_NON_EXPORTING = True
 OPEN_TAB = True
 
@@ -113,7 +117,8 @@ def normalized_positions(points):
 
 
 def extra_node_indexes(reference, other,
-                       reference_positions=None, other_positions=None):
+                       reference_positions=None, other_positions=None,
+                       reference_smooth=None, other_smooth=None):
     """Return the indexes of `other` that have no counterpart in `reference`.
 
     Both arguments are sequences of node tokens (see node_token()). A plain
@@ -122,9 +127,16 @@ def extra_node_indexes(reference, other,
     them can be picked — giving the right count at the wrong place.
 
     So the alignment is scored on a pair: first the number of unmatched
-    nodes, then how far apart the matched nodes sit along their contours.
-    The first term keeps the answer minimal, the second one picks the
-    sensible alignment out of the tie.
+    nodes, then how well the matched nodes correspond — how far apart they
+    sit along their contours, plus a penalty when one is a corner and the
+    other is smooth. The first term keeps the answer minimal, the second
+    one picks the sensible alignment out of the tie.
+
+    The corner/smooth flag only ever belongs in that second term. Glyphs
+    ignores it for compatibility, so it must never stop two nodes from
+    matching — that would invent an extra node. But masters do tend to
+    agree on which nodes are corners, and that hint is worth more than the
+    positional noise between a thin and a heavy master.
 
     Args:
         reference: Node tokens of the reference (leanest) path.
@@ -132,6 +144,9 @@ def extra_node_indexes(reference, other,
         reference_positions: Normalized positions for `reference`, or None
             to score on the token sequence alone.
         other_positions: Normalized positions for `other`.
+        reference_smooth: Per-node corner/smooth flags for `reference`, or
+            None to ignore them.
+        other_smooth: Per-node corner/smooth flags for `other`.
 
     Returns:
         A sorted list of indexes into `other`.
@@ -159,6 +174,9 @@ def extra_node_indexes(reference, other,
             if reference[i - 1] == other[j - 1]:
                 previous = cost[i - 1][j - 1]
                 distance = abs(reference_positions[i - 1] - other_positions[j - 1])
+                if (reference_smooth is not None and other_smooth is not None
+                        and reference_smooth[i - 1] != other_smooth[j - 1]):
+                    distance += SMOOTH_PENALTY
                 best = ((previous[0], previous[1] + distance), MATCH)
 
             for candidate, direction in (
@@ -254,6 +272,13 @@ def diagnose(masters_info):
             return stored[path_index]
         return None
 
+    def smooth_of(info, path_index):
+        """Corner/smooth flags of one path, when they were collected."""
+        stored = info.get("path_smooth") or []
+        if path_index < len(stored):
+            return stored[path_index]
+        return None
+
     # Reference = the master with the fewest nodes; ties keep the first one.
     def node_total(info):
         return sum(len(p) for p in info["paths"])
@@ -323,7 +348,9 @@ def diagnose(masters_info):
             node_indexes = extra_node_indexes(
                 ref_path, own_path,
                 positions_of(reference, path_index),
-                positions_of(info, path_index))
+                positions_of(info, path_index),
+                smooth_of(reference, path_index),
+                smooth_of(info, path_index))
             for node_index in node_indexes:
                 extras.append((path_index, node_index))
 
@@ -353,6 +380,7 @@ def collect_layer_info(layer, master_name):
         "name": master_name,
         "paths": [],
         "path_positions": [],
+        "path_smooth": [],
         "components": [],
         "shape_kinds": [],
         "anchors": [],
@@ -368,6 +396,7 @@ def collect_layer_info(layer, master_name):
                 node_token(node.type) for node in shape.nodes])
             info["path_positions"].append(normalized_positions([
                 (node.position.x, node.position.y) for node in shape.nodes]))
+            info["path_smooth"].append([bool(node.smooth) for node in shape.nodes])
             info["node_count"] += len(shape.nodes)
             info["paths_objects"].append(shape)
             info["shape_kinds"].append("path")
