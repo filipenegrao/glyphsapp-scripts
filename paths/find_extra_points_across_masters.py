@@ -6,10 +6,17 @@ __doc__ = """
 
 Finds and visually marks the points that break interpolation between masters.
 
-Takes the master with the FEWEST nodes as the reference and diffs every other
-master against it, node type by node type (LCS diff). The nodes that cannot be
-aligned are the extra ones — they get an ARROW annotation exactly on top of
-them, so you can see what to delete.
+Takes the master with the FEWEST nodes as the reference and aligns every other
+master against it. The nodes left without a counterpart are the extra ones —
+they get an ARROW annotation exactly on top of them, so you can see what to
+delete.
+
+Comparing node types alone is not enough: a rounded contour reads as
+"oocoocooc...", so every alignment that drops the same number of nodes ties and
+the extra points end up blamed on the wrong nodes. So each node is compared by
+type AND corner/smooth, and the tie is settled by how far apart the nodes sit
+along their contour — which is the part that stays proportional between
+compatible masters.
 
 It also reports the other classic incompatibility causes:
 path count, start point / direction, component count & order, anchors.
@@ -41,7 +48,6 @@ except ImportError:  # importable outside Glyphs, for the tests
 #  cleanup on re-runs. The .text marker below is a second net.
 TAG = "com.filipenegrao.extraPoints"
 MARKER = "⁣xp⁣"          # invisible separators, never typed by hand
-MAX_NODES_FOR_ROTATION = 64     # above this, skip the rotation search
 SKIP_NON_EXPORTING = True
 OPEN_TAB = True
 
@@ -49,43 +55,135 @@ OPEN_TAB = True
 # ---------------------------------------------------------------
 #  Pure helpers (no Glyphs API — covered by tests/)
 # ---------------------------------------------------------------
-def lcs_extra_indexes(reference, other):
-    """Return the indexes of `other` that have no counterpart in `reference`.
+def node_token(node_type, smooth):
+    """Build the symbol used to compare a node across masters.
 
-    Both arguments are sequences of node-type strings ("line", "curve",
-    "offcurve"). Uses a longest-common-subsequence alignment, so a node
-    inserted in the middle of a path is reported at its real position
-    instead of shifting everything after it.
+    The bare node type is too coarse: a rounded contour reads as
+    "oocoocooc...", so every node looks the same and the diff cannot tell
+    which one is extra. Folding in the corner/smooth flag separates the
+    corners — which stay put across masters — from the smooth nodes.
 
     Args:
-        reference: Node types of the reference (leanest) path.
-        other: Node types of the path being checked.
+        node_type: The GSNode type, "line", "curve", "offcurve" or "qcurve".
+        smooth: Whether the node is a smooth connection.
+
+    Returns:
+        The token as a string.
+    """
+    if node_type == "offcurve":
+        return "offcurve"
+    return "%s|%s" % (node_type, "smooth" if smooth else "corner")
+
+
+def normalized_positions(points):
+    """Where each node sits along its contour, as a 0..1 fraction.
+
+    Measured as the cumulative length of the polygon through the nodes
+    (off-curves included), from the path's own start node. Two compatible
+    masters distribute their nodes in roughly the same proportion along the
+    contour, which is what lets us tell apart two nodes that carry the very
+    same type.
+
+    Args:
+        points: Sequence of (x, y) tuples, in path order.
+
+    Returns:
+        A list of floats in 0..1, one per point.
+    """
+    if not points:
+        return []
+
+    lengths = [0.0]
+    total = 0.0
+    for i in range(1, len(points)):
+        previous, current = points[i - 1], points[i]
+        total += ((current[0] - previous[0]) ** 2 +
+                  (current[1] - previous[1]) ** 2) ** 0.5
+        lengths.append(total)
+
+    # Close the contour, so the last segment counts towards the total.
+    first, last = points[0], points[-1]
+    total += ((first[0] - last[0]) ** 2 + (first[1] - last[1]) ** 2) ** 0.5
+    if total <= 0:
+        return [0.0] * len(points)
+    return [length / total for length in lengths]
+
+
+def extra_node_indexes(reference, other,
+                       reference_positions=None, other_positions=None):
+    """Return the indexes of `other` that have no counterpart in `reference`.
+
+    Both arguments are sequences of node tokens (see node_token()). A plain
+    diff is not enough here: a contour's token sequence is periodic, so
+    every alignment that drops the same number of nodes ties, and any of
+    them can be picked — giving the right count at the wrong place.
+
+    So the alignment is scored on a pair: first the number of unmatched
+    nodes, then how far apart the matched nodes sit along their contours.
+    The first term keeps the answer minimal, the second one picks the
+    sensible alignment out of the tie.
+
+    Args:
+        reference: Node tokens of the reference (leanest) path.
+        other: Node tokens of the path being checked.
+        reference_positions: Normalized positions for `reference`, or None
+            to score on the token sequence alone.
+        other_positions: Normalized positions for `other`.
 
     Returns:
         A sorted list of indexes into `other`.
     """
     n, m = len(reference), len(other)
-    # table[i][j] = LCS length of reference[i:] and other[j:]
-    table = [[0] * (m + 1) for _ in range(n + 1)]
-    for i in range(n - 1, -1, -1):
-        for j in range(m - 1, -1, -1):
-            if reference[i] == other[j]:
-                table[i][j] = table[i + 1][j + 1] + 1
-            else:
-                table[i][j] = max(table[i + 1][j], table[i][j + 1])
+    if reference_positions is None or other_positions is None:
+        reference_positions = [0.0] * n
+        other_positions = [0.0] * m
+
+    SKIP_REFERENCE, SKIP_OTHER, MATCH = 0, 1, 2
+
+    # cost[i][j] = (unmatched nodes, positional cost) for reference[:i] vs other[:j]
+    cost = [[(0, 0.0)] * (m + 1) for _ in range(n + 1)]
+    move = [[SKIP_REFERENCE] * (m + 1) for _ in range(n + 1)]
+    for i in range(1, n + 1):
+        cost[i][0] = (i, 0.0)
+        move[i][0] = SKIP_REFERENCE
+    for j in range(1, m + 1):
+        cost[0][j] = (j, 0.0)
+        move[0][j] = SKIP_OTHER
+
+    for i in range(1, n + 1):
+        for j in range(1, m + 1):
+            best = None
+            if reference[i - 1] == other[j - 1]:
+                previous = cost[i - 1][j - 1]
+                distance = abs(reference_positions[i - 1] - other_positions[j - 1])
+                best = ((previous[0], previous[1] + distance), MATCH)
+
+            for candidate, direction in (
+                    ((cost[i - 1][j][0] + 1, cost[i - 1][j][1]), SKIP_REFERENCE),
+                    ((cost[i][j - 1][0] + 1, cost[i][j - 1][1]), SKIP_OTHER)):
+                if best is None or candidate < best[0]:
+                    best = (candidate, direction)
+
+            cost[i][j], move[i][j] = best
 
     extras = []
-    i = j = 0
-    while i < n and j < m:
-        if reference[i] == other[j]:
-            i += 1
-            j += 1
-        elif table[i + 1][j] >= table[i][j + 1]:
-            i += 1
-        else:
+    i, j = n, m
+    while i > 0 or j > 0:
+        if i == 0:
+            j -= 1
             extras.append(j)
-            j += 1
-    extras.extend(range(j, m))
+        elif j == 0:
+            i -= 1
+        elif move[i][j] == MATCH:
+            i -= 1
+            j -= 1
+        elif move[i][j] == SKIP_REFERENCE:
+            i -= 1
+        else:
+            j -= 1
+            extras.append(j)
+
+    extras.reverse()
     return extras
 
 
@@ -129,36 +227,6 @@ def is_reversed_match(reference, other):
     return rotation_offset(reference, backwards) is not None
 
 
-def aligned_extra_indexes(reference, other):
-    """Locate the extra nodes of `other`, ignoring where the path starts.
-
-    Node type sequences are periodic ("oocoocooc..."), so a plain diff of a
-    path that also starts at a different node can align the two sequences
-    out of phase and blame innocent nodes. This tries every rotation of
-    `other` and keeps the one that needs the fewest extra nodes.
-
-    Args:
-        reference: Node types of the reference (leanest) path.
-        other: Node types of the path being checked.
-
-    Returns:
-        A sorted list of indexes into `other`, as given.
-    """
-    best = lcs_extra_indexes(reference, other)
-    size = len(other)
-    if size < 2 or size > MAX_NODES_FOR_ROTATION:
-        return best
-
-    for offset in range(1, size):
-        rotated = other[offset:] + other[:offset]
-        extras = lcs_extra_indexes(reference, rotated)
-        if len(extras) < len(best):
-            best = sorted((i + offset) % size for i in extras)
-        if not best:
-            break
-    return best
-
-
 def diagnose(masters_info):
     """Compare the masters of a single glyph.
 
@@ -175,6 +243,13 @@ def diagnose(masters_info):
     result = {"reference": 0, "issues": [], "extras": {}}
     if len(masters_info) < 2:
         return result
+
+    def positions_of(info, path_index):
+        """Normalized node positions of one path, when they were collected."""
+        stored = info.get("path_positions") or []
+        if path_index < len(stored):
+            return stored[path_index]
+        return None
 
     # Reference = the master with the fewest nodes; ties keep the first one.
     def node_total(info):
@@ -242,7 +317,11 @@ def diagnose(masters_info):
                             info["name"], path_index + 1, offset))
                     continue
 
-            for node_index in aligned_extra_indexes(ref_path, own_path):
+            node_indexes = extra_node_indexes(
+                ref_path, own_path,
+                positions_of(reference, path_index),
+                positions_of(info, path_index))
+            for node_index in node_indexes:
                 extras.append((path_index, node_index))
 
         if extras:
@@ -270,17 +349,24 @@ def collect_layer_info(layer, master_name):
     info = {
         "name": master_name,
         "paths": [],
+        "path_positions": [],
         "components": [],
         "shape_kinds": [],
         "anchors": [],
         "paths_objects": [],
+        "node_count": 0,
     }
     if layer is None:
         return info
 
     for shape in layer.shapes:
         if isinstance(shape, GSPath):
-            info["paths"].append([str(node.type) for node in shape.nodes])
+            info["paths"].append([
+                node_token(str(node.type), bool(node.smooth))
+                for node in shape.nodes])
+            info["path_positions"].append(normalized_positions([
+                (node.position.x, node.position.y) for node in shape.nodes]))
+            info["node_count"] += len(shape.nodes)
             info["paths_objects"].append(shape)
             info["shape_kinds"].append("path")
         elif isinstance(shape, GSComponent):
@@ -312,7 +398,7 @@ def clear_annotations(layer):
     to_remove = []
     for i, annotation in enumerate(layer.annotations):
         text = annotation.text
-        if text and str(text).startswith(MARKER):
+        if text and MARKER in str(text):
             to_remove.append(i)
             continue
         position = annotation.position
@@ -354,8 +440,8 @@ def annotate_extra_nodes(layer, info, extras, reference_name):
 
     summary = GSAnnotation()
     summary.type = TEXT
-    summary.text = "%s%d extra node(s) vs. %s" % (
-        MARKER, len(extras), reference_name)
+    summary.text = "%d extra node(s) vs. %s%s" % (
+        len(extras), reference_name, MARKER)
     summary.position = NSPoint(0, -120)
     summary.width = 300
     layer.annotations.append(summary)
@@ -432,7 +518,11 @@ def main():
 
             broken.append(glyph)
             reference_name = masters_info[report["reference"]]["name"]
+            counts = ", ".join(
+                "%s %d" % (info["name"], info["node_count"])
+                for info in masters_info)
             print("[!!]  %s   (reference: %s)" % (glyph.name, reference_name))
+            print("       nodes: %s" % counts)
             for issue in report["issues"]:
                 print("       > %s" % issue)
 

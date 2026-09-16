@@ -47,7 +47,7 @@ Drop me a line if you need any help.
 
 ![change-ascenders-descenders-glyphs-script](img/ascender_descender.png)
 
-* **Find extra points across masters**: Finds and visually marks the points that break interpolation. It takes the master with the fewest nodes as the reference, diffs every other master against it node by node, and drops an ARROW annotation exactly on top of each extra point, plus a TEXT annotation with the count. It also reports the other classic incompatibility causes: path count, start point/direction, component count & order, and anchors. Works on the selected glyphs, or sweeps the whole font when nothing is selected. Re-run to clear the annotations.
+* **Find extra points across masters**: Finds and visually marks the points that break interpolation. It takes the master with the fewest nodes as the reference, aligns every other master against it, and drops an ARROW annotation exactly on top of each extra point, plus a TEXT annotation with the count. Nodes are matched by type *and* corner/smooth, and ties are settled by how far along the contour each node sits — comparing node types alone gives the right count at the wrong place, because a rounded contour reads as "oocoocooc..." and every alignment ties. It also reports the other classic incompatibility causes: path count, start point/direction, component count & order, and anchors. Works on the selected glyphs, or sweeps the whole font when nothing is selected. Re-run to clear the annotations.
 
 * **Cut selection in half (horizontally)**: If a path is selected, it cuts the path in half. This is useful for designing symmetrical marks.
 
