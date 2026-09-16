@@ -58,3 +58,7 @@ Thumbs.db
 ###########
 opensource-fonts/
 
+
+__pycache__/
+*.pyc
+.pytest_cache/
