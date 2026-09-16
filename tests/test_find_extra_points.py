@@ -10,11 +10,14 @@ LINE = "line"
 OFF = "offcurve"
 
 
-def master(name, paths, components=None, anchors=None):
+def master(name, paths, components=None, anchors=None, shape_kinds=None):
+    if shape_kinds is None:
+        shape_kinds = ["path"] * len(paths) + ["component"] * len(components or [])
     return {
         "name": name,
         "paths": paths,
         "components": components or [],
+        "shape_kinds": shape_kinds,
         "anchors": anchors or [],
     }
 
@@ -119,3 +122,49 @@ def test_anchor_mismatch_is_reported():
 def test_single_master_is_never_broken():
     report = fx.diagnose([master("Regular", [[LINE, LINE]])])
     assert report["issues"] == []
+
+
+# --- aligned_extra_indexes ----------------------------------------------
+def test_aligned_diff_matches_plain_diff_when_start_points_agree():
+    reference = [LINE, OFF, OFF, CURVE]
+    other = [LINE, LINE, OFF, OFF, CURVE]
+    assert fx.aligned_extra_indexes(reference, other) == [1]
+
+
+def test_aligned_diff_finds_the_real_node_on_a_rotated_path():
+    # Reference: three curve segments. Other: same, rotated by two nodes,
+    # with one extra line node spliced in.
+    reference = [OFF, OFF, CURVE] * 3
+    rotated = reference[2:] + reference[:2]
+    other = rotated[:4] + [LINE] + rotated[4:]
+    extras = fx.aligned_extra_indexes(reference, other)
+    assert len(extras) == 1
+    assert other[extras[0]] == LINE
+
+
+def test_aligned_diff_reports_nothing_for_a_pure_rotation():
+    reference = [OFF, OFF, CURVE, LINE, OFF, OFF, CURVE]
+    other = reference[3:] + reference[:3]
+    assert fx.aligned_extra_indexes(reference, other) == []
+
+
+def test_aligned_diff_gives_up_on_very_long_paths():
+    reference = [LINE] * (fx.MAX_NODES_FOR_ROTATION + 1)
+    other = [LINE] * (fx.MAX_NODES_FOR_ROTATION + 2)
+    assert len(fx.aligned_extra_indexes(reference, other)) == 1
+
+
+# --- shape order ---------------------------------------------------------
+def test_shape_order_mismatch_is_reported():
+    light = master("Light", [[LINE], [LINE]], components=["acutecomb"],
+                   shape_kinds=["path", "component", "path"])
+    bold = master("Bold", [[LINE], [LINE]], components=["acutecomb"],
+                  shape_kinds=["path", "path", "component"])
+    report = fx.diagnose([light, bold])
+    assert any("different order" in issue for issue in report["issues"])
+
+
+def test_same_shape_order_is_not_reported():
+    light = master("Light", [[LINE]], components=["acutecomb"])
+    bold = master("Bold", [[LINE]], components=["acutecomb"])
+    assert fx.diagnose([light, bold])["issues"] == []

@@ -18,7 +18,10 @@ path count, start point / direction, component count & order, anchors.
 — Opens a tab with the broken glyphs
 — Re-run to clear the annotations of the previous run
 
-Scope: selected glyphs, or the whole font when nothing is selected.
+Scope: selected glyphs, or the whole font when nothing is selected. Note that
+in Edit view the current tab always counts as a selection, so the whole-font
+sweep happens from Font view with nothing selected.
+
 Brace and bracket layers are out of scope (master layers only).
 
 """
@@ -33,9 +36,12 @@ except ImportError:  # importable outside Glyphs, for the tests
 # ---------------------------------------------------------------
 #  Config
 # ---------------------------------------------------------------
-#  GSAnnotation has no userData, so annotations made by this script
-#  are tagged with a prefix in their .text to allow cleanup on re-runs.
+#  GSAnnotation has no userData, so the positions of the annotations made
+#  by this script are bookkept in layer.userData, which is what allows the
+#  cleanup on re-runs. The .text marker below is a second net.
+TAG = "com.filipenegrao.extraPoints"
 MARKER = "⁣xp⁣"          # invisible separators, never typed by hand
+MAX_NODES_FOR_ROTATION = 64     # above this, skip the rotation search
 SKIP_NON_EXPORTING = True
 OPEN_TAB = True
 
@@ -123,6 +129,36 @@ def is_reversed_match(reference, other):
     return rotation_offset(reference, backwards) is not None
 
 
+def aligned_extra_indexes(reference, other):
+    """Locate the extra nodes of `other`, ignoring where the path starts.
+
+    Node type sequences are periodic ("oocoocooc..."), so a plain diff of a
+    path that also starts at a different node can align the two sequences
+    out of phase and blame innocent nodes. This tries every rotation of
+    `other` and keeps the one that needs the fewest extra nodes.
+
+    Args:
+        reference: Node types of the reference (leanest) path.
+        other: Node types of the path being checked.
+
+    Returns:
+        A sorted list of indexes into `other`, as given.
+    """
+    best = lcs_extra_indexes(reference, other)
+    size = len(other)
+    if size < 2 or size > MAX_NODES_FOR_ROTATION:
+        return best
+
+    for offset in range(1, size):
+        rotated = other[offset:] + other[:offset]
+        extras = lcs_extra_indexes(reference, rotated)
+        if len(extras) < len(best):
+            best = sorted((i + offset) % size for i in extras)
+        if not best:
+            break
+    return best
+
+
 def diagnose(masters_info):
     """Compare the masters of a single glyph.
 
@@ -158,6 +194,13 @@ def diagnose(masters_info):
                 "%s: %d path(s), reference %s has %d" % (
                     info["name"], len(info["paths"]),
                     reference["name"], len(reference["paths"])))
+
+        if info.get("shape_kinds", []) != reference.get("shape_kinds", []):
+            result["issues"].append(
+                "%s: shapes in a different order [%s], reference %s has [%s]" % (
+                    info["name"], ", ".join(info.get("shape_kinds", [])),
+                    reference["name"],
+                    ", ".join(reference.get("shape_kinds", []))))
 
         if info["components"] != reference["components"]:
             result["issues"].append(
@@ -199,7 +242,7 @@ def diagnose(masters_info):
                             info["name"], path_index + 1, offset))
                     continue
 
-            for node_index in lcs_extra_indexes(ref_path, own_path):
+            for node_index in aligned_extra_indexes(ref_path, own_path):
                 extras.append((path_index, node_index))
 
         if extras:
@@ -228,6 +271,7 @@ def collect_layer_info(layer, master_name):
         "name": master_name,
         "paths": [],
         "components": [],
+        "shape_kinds": [],
         "anchors": [],
         "paths_objects": [],
     }
@@ -238,8 +282,10 @@ def collect_layer_info(layer, master_name):
         if isinstance(shape, GSPath):
             info["paths"].append([str(node.type) for node in shape.nodes])
             info["paths_objects"].append(shape)
+            info["shape_kinds"].append("path")
         elif isinstance(shape, GSComponent):
             info["components"].append(str(shape.componentName))
+            info["shape_kinds"].append("component")
 
     info["anchors"] = [str(anchor.name) for anchor in layer.anchors]
     return info
@@ -256,13 +302,28 @@ def clear_annotations(layer):
     """
     if layer is None:
         return 0
+
+    stored = layer.userData[TAG] if layer.userData else None
+    known = set()
+    if stored:
+        for entry in stored:
+            known.add((int(entry[0]), int(entry[1])))
+
     to_remove = []
     for i, annotation in enumerate(layer.annotations):
         text = annotation.text
         if text and str(text).startswith(MARKER):
             to_remove.append(i)
+            continue
+        position = annotation.position
+        if (int(round(position.x)), int(round(position.y))) in known:
+            to_remove.append(i)
+
     for i in reversed(to_remove):
         del layer.annotations[i]
+
+    if stored:
+        del layer.userData[TAG]
     return len(to_remove)
 
 
@@ -275,6 +336,7 @@ def annotate_extra_nodes(layer, info, extras, reference_name):
         extras: List of (path_index, node_index) tuples.
         reference_name: Name of the reference master, shown in the summary.
     """
+    positions = []
     for path_index, node_index in extras:
         path = info["paths_objects"][path_index]
         node = path.nodes[node_index]
@@ -284,6 +346,11 @@ def annotate_extra_nodes(layer, info, extras, reference_name):
         annotation.width = 40
         annotation.text = MARKER
         layer.annotations.append(annotation)
+        positions.append([int(round(node.position.x)),
+                          int(round(node.position.y))])
+
+    positions.append([0, -120])
+    layer.userData[TAG] = positions
 
     summary = GSAnnotation()
     summary.type = TEXT
