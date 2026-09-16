@@ -19,8 +19,14 @@ Checklist of the work done in this repository. Newest on top.
       master and smooth in another unmatchable, so the alignment invented an
       extra node. Glyphs ignores that flag for compatibility (compareString is
       "l"/"c"/"o" only) and so do we now.
-- [ ] Re-run inside Glyphs on that ExtraBold and confirm exactly 2 arrows, both
-      on the stems.
+- [x] Stopped calibrating against modelled contours. `tests/test_find_extra_points_real_g.py`
+      holds the actual node data of glyph "g" (Thin and ExtraBold) from the font
+      that reported the bug, so the fixture cannot drift from reality.
+- [x] The corner/smooth flag is back, but as a term in the secondary cost
+      instead of a matching constraint, so it can steer the alignment without
+      ever changing the count.
+- [ ] Re-run inside Glyphs on glyph "g" and confirm the arrows land on
+      (19, -61) and (157, -35).
 - [ ] The Glyphs side (annotation placement, userData cleanup, scope) still has
       no coverage — only the alignment is tested.
 
