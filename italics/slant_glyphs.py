@@ -1,14 +1,15 @@
 #MenuTitle: Slant Glyphs
 # -*- coding: utf-8 -*-
 from __future__ import division, print_function, unicode_literals
-import copy
+
 import math
 import traceback
-from vanilla import *
+from vanilla import Window, TextBox, EditText, ColorWell, Button
+from Foundation import NSPoint
 from AppKit import NSColor, NSCalibratedRGBColor
+from GlyphsApp import Glyphs, GSGuide, DRAWBACKGROUND
 
-
-__doc__="""
+__doc__ = """
 
 (GUI) This tool is build to slant all selected glyphs in Edit View while adds a copy of the roman version in the background.
 It's not supposed to be an automatic italic solution but gives you a head start.
@@ -30,18 +31,20 @@ class GlyphSlanter(object):
 
 		self.w = Window((250, 280), "Slant Glyphs")
 
-		self.w.slant_label = TextBox((20, 20, -100, 20), u"Slant (°)", alignment = "right")
-		self.w.slant = EditText((160, 20, -20, 20), placeholder = "0")
-		self.w.width_label = TextBox((20, 50, -100, 20), "Width (%)", alignment = "right")
-		self.w.width = EditText((160, 50, -20, 20), placeholder = "100")
-		self.w.height_label = TextBox((20, 80, -100, 20), "Height (%)", alignment = "right")
-		self.w.height = EditText((160, 80, -20, 20), placeholder = "100")
-		self.w.color_label = TextBox((20, 115, -100, 20), "Background Color", alignment = "right")
-		self.w.color_well = ColorWell((160, 110, -20, 30),
-							color = NSColor.colorWithCalibratedRed_green_blue_alpha_(0.93, 0.95, 0.92, 1.0))
-		self.w.selected_glyphs = Button((20, 175, -20, 20), "Change Selected Glyphs", callback = self.selected_glyphs_callback)
-		self.w.change_color_callback = Button((20, 205, -20, 20), "Change Background Color", callback = self.change_color_callback)
-		self.w.add_guide_callback = Button((20, 235, -20, 20), "Add Angle Guideline", callback = self.add_guide_callback)
+		self.w.slant_label = TextBox((20, 20, -100, 20), u"Slant (°)", alignment="right")
+		self.w.slant = EditText((160, 20, -20, 20), placeholder="0")
+		self.w.width_label = TextBox((20, 50, -100, 20), "Width (%)", alignment="right")
+		self.w.width = EditText((160, 50, -20, 20), placeholder="100")
+		self.w.height_label = TextBox((20, 80, -100, 20), "Height (%)", alignment="right")
+		self.w.height = EditText((160, 80, -20, 20), placeholder="100")
+		self.w.color_label = TextBox((20, 115, -100, 20), "Background Color", alignment="right")
+		self.w.color_well = ColorWell(
+			(160, 110, -20, 30),
+			color=NSColor.colorWithCalibratedRed_green_blue_alpha_(0.93, 0.95, 0.92, 1.0)
+		)
+		self.w.selected_glyphs = Button((20, 175, -20, 20), "Change Selected Glyphs", callback=self.selected_glyphs_callback)
+		self.w.change_color_callback = Button((20, 205, -20, 20), "Change Background Color", callback=self.change_color_callback)
+		self.w.add_guide_callback = Button((20, 235, -20, 20), "Add Angle Guideline", callback=self.add_guide_callback)
 
 		self.w.open()
 
@@ -77,7 +80,7 @@ class GlyphSlanter(object):
 	def get_color(self):
 		try:
 			if type(self.w.color_well.get()) == NSCalibratedRGBColor:
-				rgba_float = [0.93, 0.95, 0.92, 1.0] # dafault value
+				rgba_float = [0.93, 0.95, 0.92, 1.0]  # dafault value
 				return rgba_float
 			else:
 				RGBA = self.w.color_well.get()
@@ -95,8 +98,8 @@ class GlyphSlanter(object):
 	def draw_guide(self, angle):
 		try:
 			for layer in Glyphs.font.selectedLayers:
-				new_guide = GSGuideLine()
-				new_guide.position = 0, 0
+				new_guide = GSGuide()
+				new_guide.position = NSPoint(0, 0)
 				new_guide.angle = 90.0 - angle
 				new_guide.name = str(angle) + u'°'
 				layer.guides.append(new_guide)
@@ -120,7 +123,7 @@ class GlyphSlanter(object):
 	def copy_fore2background(self):
 		# iterate all paths and append them into the list of paths.
 		try:
-			for layer in Font.selectedLayers:
+			for layer in Glyphs.font.selectedLayers:
 				background_layer = layer.background
 				# background_layer.paths = []
 				for path in layer.paths:
@@ -129,17 +132,17 @@ class GlyphSlanter(object):
 		except Exception as e:
 			raise e
 
-	def matrix(self, angle, horizontal, vertical):
+	def matrix(self, angle: float, horizontal: float, vertical: float):
 		try:
 			for layer in Glyphs.font.selectedLayers:
-				layer.applyTransform([
-						horizontal, # x scale factor
-						0.0, # x skew factor
-						math.radians(angle), (center), # y skew factor
-						vertical, # y scale factor
-						0.0, # x position
-						0.0  # y position
-						])
+				layer.applyTransform((
+					horizontal,  # x scale factor
+					0.0,  # x skew factor
+					math.radians(angle),  # y skew factor
+					vertical,  # y scale factor
+					0.0,  # x position
+					0.0  # y position
+				))
 		except Exception as e:
 			raise e
 
@@ -166,17 +169,17 @@ GlyphSlanter()
 """
 Traceback (most recent call last):
 
-  File "/Users/filipenegrao/Library/Application Support/Glyphs 3/Scripts/vanilla/vanillaBase.py", line 506, in action_
-    self.callback(sender)
+	File "/Users/filipenegrao/Library/Application Support/Glyphs 3/Scripts/vanilla/vanillaBase.py", line 506, in action_
+		self.callback(sender)
 
-  File "/Users/filipenegrao/Documents/github/glyphsapp-scripts/italics/slant_glyphs.py", line 151, in selected_glyphs_callback
-    self.copy_fore2background()
+	File "/Users/filipenegrao/Documents/github/glyphsapp-scripts/italics/slant_glyphs.py", line 151, in selected_glyphs_callback
+		self.copy_fore2background()
 
-  File "/Users/filipenegrao/Documents/github/glyphsapp-scripts/italics/slant_glyphs.py", line 129, in copy_fore2background
-    raise e
+	File "/Users/filipenegrao/Documents/github/glyphsapp-scripts/italics/slant_glyphs.py", line 129, in copy_fore2background
+		raise e
 
-  File "/Users/filipenegrao/Documents/github/glyphsapp-scripts/italics/slant_glyphs.py", line 124, in copy_fore2background
-    background_layer.paths = []
+	File "/Users/filipenegrao/Documents/github/glyphsapp-scripts/italics/slant_glyphs.py", line 124, in copy_fore2background
+		background_layer.paths = []
 
 AttributeError: can't set attribute
 """
