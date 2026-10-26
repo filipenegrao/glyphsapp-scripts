@@ -62,3 +62,7 @@ opensource-fonts/
 __pycache__/
 *.pyc
 .pytest_cache/
+
+# big word lists (kept locally, not worth versioning) #
+#######################################################
+workflow/usp_most_used_pt.txt

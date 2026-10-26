@@ -31,6 +31,12 @@ Checklist of the work done in this repository. Newest on top.
       no coverage — only the alignment is tested.
 
 ## Backlog
+- [ ] `workflow/usp_most_used_pt.txt` — a 261,798-word Portuguese frequency list
+      from USP, the counterpart of the English `mit_most_used_en.txt` already in
+      this folder. It was rescued from an abandoned 2024 clone and is kept
+      locally (gitignored, 2.9 MB). It was meant for some script that was never
+      written — proofing strings, a pangram or minimal-pair finder, a sample
+      text generator. Worth revisiting.
 - [ ] `components/check_corner_components_across_masters.py` tags its annotations
       via `GSAnnotation.userData`, which does not exist — the cleanup on re-run
       never removes anything. Port it to the `.text` marker used by
